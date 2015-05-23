@@ -1,0 +1,23 @@
+CC = cl
+CFLAGS = /GX /O2
+
+EXEC = mzf2wav.exe
+MAIN = mzf2wav.c
+OBJS = physical.obj methods.obj args.obj wav.obj 
+
+all: $(EXEC)
+
+release: all
+	copy $(EXEC) w32\release
+
+.cc.o:
+	$(CC) $(CFLAGS) /c $<
+	
+$(EXEC): $(MAIN) $(OBJS)
+	$(CC) $(CFLAGS) /o $@ $(MAIN) $(OBJS)
+
+clean:
+	del *.obj
+
+realclean: clean
+	del $(EXEC)
