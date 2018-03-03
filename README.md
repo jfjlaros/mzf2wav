@@ -1,29 +1,33 @@
 # MZF2WAV
-There are several ways to transfer the downloadable MZF-files of my site to
-your MZ or directly to your data recorder:
+There are several ways to transfer the
+[downloadable MZF-files](https://sharpmz.org/) to your MZ or directly to your
+data recorder:
 
 - Directly connect the data recorder to your PC and use the PC-interface.
 - Connect your MZ or your data recorder to the soundcard of your PC.
 
-The first method is described on my page "PC tape interface" and also enables
-you to receive files from your data recorder.
+The first method is described on the page
+[PC tape interface](https://sharpmz.org/mztape.htm) and also enables you to
+receive files from your data recorder.
 
-The second method is described on my page "File transfer / Data transfer
-problem". Karl Walpuski describes the transfer from the MZ to the PC using the
-program tapeload.exe, but if you use a WAV-player-program like the Windows
-Mediaplayer and you have connected your MZ or data recorder to the output
-connector of your PC soundcard, then you can transfer your files into the other
-direction. In this case, of course, you do not need tapeload.exe, but you need
-a converter program which converts your MZF-files (or M12, or MZT; simple
-rename the file to MZF) to a WAV-file which can be transmitted directly.
+The second method is described on the page
+[File transfer / Data transfer problem](https://sharpmz.org/mz-700/filetrans.htm).
+Karl Walpuski describes the transfer from the MZ to the PC using the program
+tapeload.exe, but if you use a WAV-player-program like the Windows Mediaplayer
+and you have connected your MZ or data recorder to the output connector of your
+PC soundcard, then you can transfer your files into the other direction. In
+this case, of course, you do not need tapeload.exe, but you need a converter
+program which converts your MZF-files (or M12, or MZT; simple rename the file
+to MZF) to a WAV-file which can be transmitted directly.
 
 If you decide to use an audio recorder to interface between an MZ and your PC,
 think first about all problems you can get by doing this. And, be sure, there
-are a lot of problems waiting for you! Please read my article: Using an audio
-recorder first before you decide. At a first sight using an audio recorder
-looks very user-friendly and simple to do (e.g., only a standard stereo cinch
-cable is needed and a transfer program). But, sooner or later you'll get a
-knowledge about why data recorders exist. ;-)
+are a lot of problems waiting for you! Please read the article:
+[Using an audio recorder](https://sharpmz.org/mz-700/usetape2.htm) first before
+you decide. At a first sight using an audio recorder looks very user-friendly
+and simple to do (e.g., only a standard stereo cinch cable is needed and a
+transfer program). But, sooner or later you'll get a knowledge about why data
+recorders exist. ;-)
 
 We also know, and so, a program to transfer MZF-files to the MZ is in progress
 by the author Jeroen F.J. Laros. It will work on all Wins and Linux.
