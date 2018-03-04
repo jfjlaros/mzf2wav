@@ -1,64 +1,68 @@
 # MZF2WAV
-There are several ways to transfer the
-[downloadable MZF-files](https://sharpmz.org/) to your MZ or directly to your
-data recorder:
+This document covers software to transfer an MZF image to a cassette by using a
+WAV file as an intermediate.
 
-- Directly connect the data recorder to your PC and use the PC-interface.
-- Connect your MZ or your data recorder to the soundcard of your PC.
 
-The first method is described on the page
-[PC tape interface](https://sharpmz.org/mztape.htm) and also enables you to
-receive files from your data recorder.
+## Background
+This project is closely related to [MZPut](https://github.com/jfjlaros/mzput),
+which is used to transfer an MZF image from a PC directly to an MZ. MZPut was
+originally built upon this utility, but later versions of MZF2WAV were inspired
+by MZPut.
 
-The second method is described on the page
-[File transfer / Data transfer problem](https://sharpmz.org/mz-700/filetrans.htm).
-Karl Walpuski describes the transfer from the MZ to the PC using the program
-tapeload.exe, but if you use a WAV-player-program like the Windows Mediaplayer
-and you have connected your MZ or data recorder to the output connector of your
-PC soundcard, then you can transfer your files into the other direction. In
-this case, of course, you do not need tapeload.exe, but you need a converter
-program which converts your MZF-files (or M12, or MZT; simple rename the file
-to MZF) to a WAV-file which can be transmitted directly.
+Also see the related pages:
 
-If you decide to use an audio recorder to interface between an MZ and your PC,
-think first about all problems you can get by doing this. And, be sure, there
-are a lot of problems waiting for you! Please read the article:
-[Using an audio recorder](https://sharpmz.org/mz-700/usetape2.htm) first before
-you decide. At a first sight using an audio recorder looks very user-friendly
-and simple to do (e.g., only a standard stereo cinch cable is needed and a
-transfer program). But, sooner or later you'll get a knowledge about why data
-recorders exist. ;-)
+- [PC tape interface](https://sharpmz.org/mztape.htm).
+- [File transfer / Data transfer problem](https://sharpmz.org/mz-700/filetrans.htm).
+- [Using an audio recorder](https://sharpmz.org/mz-700/usetape2.htm).
 
-We also know, and so, a program to transfer MZF-files to the MZ is in progress
-by the author Jeroen F.J. Laros. It will work on all Wins and Linux.
 
-This article describes a converter MZF to WAV. It is written by Jeroen F.J.
-Laros from Netherlands. There are other converters available in the internet (I
-saw e.g., a Japanese MZF2WAV-program, a Czech TransManger, Adler's MZ-800
-emulator contains also such a converter) but this version is very simple to use
-and allows several baud rates.
+## Installation
+### Binaries
+There are pre-compiled binaries for
+[Linux](https://sharpmz.org/download/mzf2wav32.zip) and
+[Windows](https://sharpmz.org/download/mzf2wav.zip). After unzupping the
+archive, the binary for Linux can be found in `mzf2wav/src/linux/release`, for
+Windows it can be foind in `mzf2wav/src/w32/release/mzf2wav.exe`.
 
+### From source
+Retrieve the source code with Git.
+
+    git clone https://github.com/jfjlaros/mzf2wav.git
+
+To compile for Linux:
+
+    cd mzf2wav/src/linux
+    sh build.sh
+
+For Windows, use:
+
+    cd mzf2wav\src\w32
+    build.bat
+
+The binary will be placed in the `release` subdirectory.
+
+
+## Usage
 ![The help screen of MZF2WAV](doc/mzf2wavs1.gif)
 
-Simply type
+To convert an MZF image named `image.mzf` to a WAV file named `image.wav`, run
+the following command:
 
-    mzf2wav inputfile outputfile
+    mzf2wav image.mzf image.wav
 
-in the Windows-DOS prompt (The program will not work under plain DOS!) and a
-WAV-file containing your program will be written with the standard speed of
-1200 baud. `inputfile` is the name of your MZF-file (e.g., `myprog.mzf`) and
-`outputfile` is the name of the new WAV-file (e.g., `myprog.wav`). Use path
-information for all files if required. Change the BAT-file for your purposes if
-you prefer to use it.
+The program recognises the following options:
 
-All options shown in the screenshot above are optional and described in the
-author's manual.
+| option | description
+|--------|:--
+|   `-i` | sets initial speed mode (0, 1, 2, 3 or 4), default = 0.
+|   `-t` | sets turbo speed mode (0, 1, 2, 3 or 4), default = 2.
+|   `-1` | sets correction for fast initial mode (-50 to 50).
+|   `-2` | sets correction for fast turbo mode (-50 to 50).
+|   `-c` | sets conventional writing mode.
+|   `-s` | sets fast writing mode (default).
+|   `-w` | sets turbo writing mode.
+|   `-p` | reverse polarity.
 
-Download it now (PDF, 41kb, 6 pages) - you'll need it.
-
-Download this utility now (25kb, all Windows). The sourcecode is included.
-Download this utility now (14kb, LINUX). The sourcecode is included.
-
-The MZ-80B is not supported, because your MZ-80B reads or writes using 1800
-bauds (MZ-80K, MZ-80A, MZ-700, and MZ-800, and some other Japanese types of
-MZs, all use 1200 baud).
+For a full explanation of the different modes of operation, see the section
+[operation modes](https://github.com/jfjlaros/mzput#operation-modes) of the
+MZPut documentation.
