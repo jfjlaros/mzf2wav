@@ -20,9 +20,9 @@ Also see the related pages:
 ### Binaries
 There are pre-compiled binaries for
 [Linux](https://sharpmz.org/download/mzf2wav32.zip) and
-[Windows](https://sharpmz.org/download/mzf2wav.zip). After unzupping the
+[Windows](https://sharpmz.org/download/mzf2wav.zip). After unzipping the
 archive, the binary for Linux can be found in `mzf2wav/src/linux/release`, for
-Windows it can be foind in `mzf2wav/src/w32/release/mzf2wav.exe`.
+Windows it can be found in `mzf2wav\src\w32\release`.
 
 ### From source
 Retrieve the source code with Git.
