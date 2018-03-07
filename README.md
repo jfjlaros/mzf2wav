@@ -66,3 +66,10 @@ The program recognises the following options:
 For a full explanation of the different modes of operation, see the section
 [operation modes](https://github.com/jfjlaros/mzput#operation-modes) of the
 MZPut documentation.
+
+
+## Acknowledgements
+The author would like to acknowledge Karl-Heinz Mau for:
+
+- Testing the Windows program and giving feedback.
+- [Hosting](https://www.sharpmz.org/mzf2wav.htm) the project.
