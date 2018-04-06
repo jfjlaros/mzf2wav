@@ -68,6 +68,14 @@ For a full explanation of the different modes of operation, see the section
 MZPut documentation.
 
 
+## Related software
+Please check out Ricky El-Qasem's
+[MZF2WAVGUI](https://github.com/rickyelqasem/MZF2WAVGUI), a graphical user
+interface for this project (Windows only). He also made a nice
+[tutorial](https://www.youtube.com/watch?v=iwD3-5ENyE8) on how to use this
+software to directly connect to an MZ.
+
+
 ## Acknowledgements
 The author would like to acknowledge Karl-Heinz Mau for:
 
