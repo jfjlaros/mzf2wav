@@ -1,7 +1,7 @@
 Usage
 =====
 
-.. figure:: doc/mzf2wavs1.gif
+.. figure:: ../doc/mzf2wavs1.gif
    :alt: The help screen of MZF2WAV
 
    The help screen of MZF2WAV
