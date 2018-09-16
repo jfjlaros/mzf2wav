@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h> // Just to remove a warning (exit).
 #include "args.h"
@@ -29,7 +30,7 @@ int chtoi(char *string) {
   return temp;
 }//chtoi
 
-// Convert the a string to an integer and check the boundries.
+// Convert a string to an integer and check the boundries.
 int stoi(char *string) {
   int i = 0,
       m = 1,
@@ -59,11 +60,12 @@ int stoi(char *string) {
 // Public functions.
 // Print usage and return an error code.
 void error(int i) {
-  printf("Usage: mzf2wav <-i n> <-t n> <-1 n> <-2 n> <-c> <-s> <-w> in out\n"
+  printf("Usage: mzf2wav <-i n> <-t n> <-1 n> <-2 n> <-b n> <-c> <-s> <-w> <-p> in out\n"
          " -i sets initial speed mode (0, 1, 2, 3 or 4), default = 0.\n"
          " -t sets turbo speed mode (0, 1, 2, 3 or 4), default = 2.\n"
          " -1 sets correction for fast initial mode (-50 to 50).\n"
          " -2 sets correction for fast turbo mode (-50 to 50).\n"
+         " -b sets bit rate.\n"
          " -c sets conventional writing mode.\n"
          " -s sets fast writing mode (default).\n"
          " -w sets turbo writing mode.\n"
@@ -73,6 +75,7 @@ void error(int i) {
 
 // Set the configuration variables.
 int setvars(int argc, char **argv) {
+  char *endptr;
   int temp = 0,
       i = 1;
   
@@ -113,6 +116,16 @@ int setvars(int argc, char **argv) {
             error(1);
           }//if
           corr_2 = temp;
+          i++;
+          break;
+        case 'b':                                   // Bit rate.
+          errno = 0;
+          temp = strtol(argv[i + 1], &endptr, 10);
+          if (errno) {
+            printf("No valid bit rate given.\n");
+            error(1);
+          }//if
+          setbitrate((uint32_t)temp);
           i++;
           break;
         case 'c':

@@ -1,4 +1,4 @@
-.. doc_test documentation.
+.. mzf2wav documentation.
 
 .. include:: ../README.rst
 

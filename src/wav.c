@@ -15,8 +15,8 @@ byte header[44] = { 'R', 'I', 'F', 'F',   // File description header.
                     0x10, 0x0, 0x0, 0x0,  // Size of WAVE section chunck.
                     0x1, 0x0,             // Wave type format.
                     0x1, 0x0,             // Mono or stereo.
-                    0x44, 0xac, 0x0, 0x0, // Sample rate.
-                    0x44, 0xac, 0x0, 0x0, // Bytes per second.
+                    0x44, 0xad, 0x0, 0x0, // Sample rate.
+                    0x44, 0xad, 0x0, 0x0, // Bytes per second.
                     0x1, 0x0,             // Block alignment.
                     0x8, 0x0,             // Bits per sample.
                     'd', 'a', 't', 'a',   // "data" Description header.
@@ -24,6 +24,15 @@ byte header[44] = { 'R', 'I', 'F', 'F',   // File description header.
 
 
 // Public functions.
+void setbitrate(uint32_t bitrate) {
+  int i;
+
+  for (i = 0; i < 4; i++) {
+    header[i + 24] = bitrate >> (8 * i) & 0xff;
+    header[i + 28] = bitrate >> (8 * i) & 0xff;
+  }
+}
+
 void outb(int value, int port) {
   fprintf(OUT, "%c", value);
 }//outb

@@ -7,4 +7,4 @@ using a WAV file as an intermediate.
 Please see ReadTheDocs_ for the latest documentation.
 
 
-.. _ReadTheDocs: http://mzf2wav.readthedocs.io/en/latest/index.html
+.. _ReadTheDocs: https://mzf2wav.readthedocs.io/en/latest/index.html

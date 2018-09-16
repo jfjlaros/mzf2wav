@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 // Defenitions.
 #define DEFAULT_LONG_UP       21 // Normal mode.
 #define DEFAULT_LONG_DOWN     21
@@ -25,6 +27,7 @@
 #define TURBO_FAST_SHORT_DOWN 4
 
 // Prototypes.
-void outb(int, int),
+void setbitrate(uint32_t),
+     outb(int, int),
      writewavheader(void),
      setheader(void);
