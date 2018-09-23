@@ -35,5 +35,5 @@ For Windows, use:
 The binary will be placed in the ``release`` subdirectory.
 
 
-.. _Linux: https://sharpmz.org/download/mzf2wav32.zip
-.. _Windows: https://sharpmz.org/download/mzf2wav.zip
+.. _Linux: https://web.archive.org/web/20170831235756/https://www.sharpmz.org/download/mzf2wav.zip
+.. _Windows: https://web.archive.org/web/20170831235756/https://www.sharpmz.org/download/mzf2wav32.zip

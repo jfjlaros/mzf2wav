@@ -13,6 +13,6 @@ Also see the related pages:
 
 
 .. _MZPut: https://github.com/jfjlaros/mzput
-.. _interface: https://sharpmz.org/mztape.htm
-.. _problem: https://sharpmz.org/mz-700/filetrans.htm
-.. _recorder: https://sharpmz.org/mz-700/usetape2.htm
+.. _interface: https://web.archive.org/web/20170831235708/http://www.sharpmz.org/mztape.htm
+.. _problem: https://web.archive.org/web/20170831235447/http://www.sharpmz.org/mz-700/filetrans.htm
+.. _recorder: https://web.archive.org/web/20170831235529/http://www.sharpmz.org/mz-700/usetape2.htm

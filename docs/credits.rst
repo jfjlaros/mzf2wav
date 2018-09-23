@@ -15,6 +15,6 @@ And Ricky El-Qasem for:
   MZ.
 
 
-.. _Hosting: https://www.sharpmz.org/mzf2wav.htm
+.. _Hosting: https://web.archive.org/web/20170831235756/https://www.sharpmz.org/mzf2wav.htm
 .. _MZF2WAVGUI: https://github.com/rickyelqasem/MZF2WAVGUI
 .. _tutorial: https://www.youtube.com/watch?v=iwD3-5ENyE8
