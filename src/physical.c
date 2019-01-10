@@ -3,6 +3,7 @@
 // Defenitions.
 #define CONTP 0x37a
 extern dword fs;
+extern int divider;
 
 // Global variables.
 byte ZERO = 0x30,
@@ -120,6 +121,10 @@ void setspeed(int i) {
       SHORT_UP = DEFAULT_SHORT_UP;
       SHORT_DOWN = DEFAULT_SHORT_DOWN;
   }//switch
+  LONG_UP = LONG_UP / divider;
+  LONG_DOWN = LONG_DOWN / divider;
+  SHORT_UP = SHORT_UP / divider;
+  SHORT_DOWN = SHORT_DOWN / divider;
 }//setspeed
 
 // Write a byte and count the ones for the checksum.

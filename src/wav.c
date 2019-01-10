@@ -7,20 +7,23 @@ extern FILE *OUT;
 
 // Global variables.
 dword fs = 0;
+int divider = 1;
+
 // Numbers are little endian.
-byte header[44] = { 'R', 'I', 'F', 'F',   // File description header.
-                    0x0, 0x0, 0x0, 0x0,   // Filesize - 8.
-                    'W', 'A', 'V', 'E',   // "WAVE" Description header.
-                    'f', 'm', 't', ' ',   // "fmt " Description header.
-                    0x10, 0x0, 0x0, 0x0,  // Size of WAVE section chunck.
-                    0x1, 0x0,             // Wave type format.
-                    0x1, 0x0,             // Mono or stereo.
-                    0x44, 0xad, 0x0, 0x0, // Sample rate.
-                    0x44, 0xad, 0x0, 0x0, // Bytes per second.
-                    0x1, 0x0,             // Block alignment.
-                    0x8, 0x0,             // Bits per sample.
-                    'd', 'a', 't', 'a',   // "data" Description header.
-                    0x0, 0x0, 0x0, 0x0 }; // Size of data chunk.
+byte header[44] = {
+  'R', 'I', 'F', 'F',       // File description header.
+  0x00, 0x00, 0x00, 0x00,   // Filesize - 8.
+  'W', 'A', 'V', 'E',       // "WAVE" Description header.
+  'f', 'm', 't', ' ',       // "fmt " Description header.
+  0x10, 0x00, 0x00, 0x00,   // Size of WAVE section chunk.
+  0x01, 0x00,               // Wave type format.
+  0x01, 0x00,               // Mono or stereo.
+  0x44, 0xad, 0x00, 0x00,   // Sample rate.
+  0x44, 0xad, 0x00, 0x00,   // Bytes per second.
+  0x01, 0x00,               // Block alignment.
+  0x08, 0x00,               // Bits per sample.
+  'd', 'a', 't', 'a',       // "data" Description header.
+  0x00, 0x00, 0x00, 0x00 }; // Size of data chunk.
 
 
 // Public functions.
@@ -31,6 +34,7 @@ void setbitrate(uint32_t bitrate) {
     header[i + 24] = bitrate >> (8 * i) & 0xff;
     header[i + 28] = bitrate >> (8 * i) & 0xff;
   }
+  divider = 44100 / bitrate;
 }
 
 void outb(int value, int port) {
