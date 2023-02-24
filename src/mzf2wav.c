@@ -13,6 +13,7 @@
  */
 #include <stdio.h>
 #include <stdlib.h> // Just to remove a warning (malloc).
+#include <string.h>
 #include "methods.h"
 #include "args.h"
 
@@ -44,6 +45,10 @@ byte *readfile(FILE *IN) {
     image = temp;
     i++;
   }//while
+  if (!memcmp(image, "MZF1", 4)) {
+    memmove(image, image + 4, i);
+    i -= 4;
+  }
   t = assert(image, i);
   if (t) {
     printf("The MZF file size does not match the image size.\n");
