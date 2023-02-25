@@ -49,7 +49,7 @@ void writewavheader(void) {
     fprintf(OUT, "%c", header[i]);
 }//writewavheader
 
-// Set the filesizes in the WAV header. 
+// Set the filesizes in the WAV header.
 void setheader(void) {
   dword temp = fs;
   int i = 0;

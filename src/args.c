@@ -21,7 +21,7 @@ int chtoi(char *), // Convert the first char of a string to an integer.
 // Convert the first char of a string to an integer and check the boundries.
 int chtoi(char *string) {
   int temp = 0;
-  
+
   if (!string)
     return -1;
   temp = (int)string[0] - 48;
@@ -36,14 +36,14 @@ int stoi(char *string) {
       m = 1,
       temp = 0,
       ret = 0;
-  
+
   if (!string)
     return -100;
   if (string[0] == '-') {
     m = -1;
     i++;
   }//if
-    
+
   while (string[i]) {
     temp = (int)string[i] - 48;
     if ((temp < 0) || (temp > 9))
@@ -78,7 +78,7 @@ int setvars(int argc, char **argv) {
   char *endptr;
   int temp = 0,
       i = 1;
-  
+
   while (i < argc) {
     if (argv[i][0] == '-')
       switch (argv[i][1]) {
@@ -159,6 +159,6 @@ int setvars(int argc, char **argv) {
     printf("No output filename given.\n");
     error(1);
   }//if
-    
+
   return 0;
 }//setvars

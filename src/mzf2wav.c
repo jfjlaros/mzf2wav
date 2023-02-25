@@ -2,13 +2,13 @@
  * mzf2wav by: Jeroen F. J. Laros.
  *
  * Last change on: Sep 11 2003.
- * 
- * This program is freeware and may be used without paying any registration 
- * fees. It may be distributed freely provided it is done so using the 
- * original, unmodified version. Usage of parts of the source code is granted, 
- * provided the author is referenced. For private use only. Re-selling or any 
+ *
+ * This program is freeware and may be used without paying any registration
+ * fees. It may be distributed freely provided it is done so using the
+ * original, unmodified version. Usage of parts of the source code is granted,
+ * provided the author is referenced. For private use only. Re-selling or any
  * commercial use of this program or parts of it is strictly forbidden. The
- * author is not responsible for any damage or data loss as a result of using 
+ * author is not responsible for any damage or data loss as a result of using
  * this program.
  */
 #include <stdio.h>
@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
   FILE *IN = NULL;
   byte *image = NULL;
   int i = 0;
-  
+
   setvars(argc, argv);
 
   IN = fopen(filename, "rb");
@@ -74,7 +74,7 @@ int main(int argc, char **argv) {
     printf("Unable to open file: %s for reading.\n\n", argv[1]);
     error(2);
   }//if
-  
+
   image = readfile(IN);
   if (!image) {
     printf("Out of memory or assertion error.\n\n");
@@ -93,7 +93,7 @@ int main(int argc, char **argv) {
     i++;
 
   setspeed(speed_1);
-  
+
   writewavheader();
   method(image);
   setheader();
@@ -101,6 +101,6 @@ int main(int argc, char **argv) {
   fclose(OUT);
   free(image);
   fclose(IN);
-  
+
   return 0;
 }//main

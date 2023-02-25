@@ -18,7 +18,7 @@ int LONG_UP = 0,    // These variables define the long wave.
 // Private function prototypes.
 void lp(void), // Long pulse.
      sp(void); // Short pulse.
-       
+
 // Private functions.
 // Write a long pulse.
 void lp(void) {
@@ -52,7 +52,7 @@ void reversepol(void) {
 // Write a gap of i short pulses.
 void gap(int i) {
   int j = 0;
-  
+
   for (j = 0; j < i; j++)
     sp();
 }//gap
@@ -73,7 +73,7 @@ void tapemark(int i) {
 void writecs(word cs) {
   byte i = 0x0;
   int j = 0;
-  
+
   cs &= 0xffff;
   for (j = 0x3; j; j >>= 1) {    // for (j = 0; j < 2; j++)
     for (i = 0xff; i; i >>= 1) { // for (i = 0; i < 8; i++)
@@ -82,7 +82,7 @@ void writecs(word cs) {
       else
         sp();                    // Else write a zero.
       cs <<= 1;                  // Go to the next bit.
-    }//for 
+    }//for
     lp();
   }//for
   lp();
@@ -131,7 +131,7 @@ void setspeed(int i) {
 word writebyte(byte b) {
   word cs = 0x0;
   byte i = 0x0;
-  
+
   for (i = 0xff; i; i >>= 1) {
     if (b & 0x80) {
       lp();
