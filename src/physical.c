@@ -1,165 +1,175 @@
 #include "physical.h"
 
-// Defenitions.
-#define CONTP 0x37a
-extern dword fs;
-extern int divider;
+// Normal mode.
+uint8_t const defaultLongUp = 21;
+uint8_t const defaultLongDown = 21;
+uint8_t const defaultShortUp = 11;
+uint8_t const defaultShortDown = 11;
 
-// Global variables.
-byte ZERO = 0x30,
-     ONE = 0xd0;
-int LONG_UP = 0,    // These variables define the long wave.
-    LONG_DOWN = 0,
-    SHORT_UP = 0,   // These variables define the short wave.
-    SHORT_DOWN = 0,
-    corr_1 = 0,
-    corr_2 = 0;
+// Fastest in normal mode.
+uint8_t const fastLongUp = 11;
+uint8_t const fastLongDown = 21;
+uint8_t const fastShortUp = 11;
+uint8_t const fastShortDown = 12;
 
-// Private function prototypes.
-void lp(void), // Long pulse.
-     sp(void); // Short pulse.
+// Turbo 2x.
+uint8_t const turbo2LongUp = 11;
+uint8_t const turbo2LongDown = 11;
+uint8_t const turbo2ShortUp = 5;
+uint8_t const turbo2ShortDown = 6;
 
-// Private functions.
-// Write a long pulse.
-void lp(void) {
-  int j = 0;
+// Turbo 3x.
+uint8_t const turbo3LongUp = 7;
+uint8_t const turbo3LongDown = 7;
+uint8_t const turbo3ShortUp = 3;
+uint8_t const turbo3ShortDown = 4;
 
-  for (j = 0; j < LONG_UP; j++)
-    outb(ZERO, CONTP);
-  for (j = 0; j < LONG_DOWN; j++)
-    outb(ONE, CONTP);
-  fs += LONG_UP + LONG_DOWN;
-}//lp
+// Fastest in turbo mode.
+uint8_t const turboFastLongUp = 3;
+uint8_t const turboFastLongDown = 7;
+uint8_t const turboFastShortUp = 3;
+uint8_t const turboFastShortDown = 4;
 
-// Write a short pulse.
-void sp(void) {
-  int j = 0;
+// Long wave.
+static int longUp = 0;
+static int longDown = 0;
 
-  for (j = 0; j < SHORT_UP; j++)
-    outb(ZERO, CONTP);
-  for (j = 0; j < SHORT_DOWN; j++)
-    outb(ONE, CONTP);
-  fs += SHORT_UP + SHORT_DOWN;
-}//lp
+// Short wave.
+static int shortUp = 0;
+static int shortDown = 0;
 
-// Public functions.
-// Reverse polarity.
-void reversepol(void) {
-  ZERO = 0xd0;
-  ONE = 0x30;
-}//reversepol
+// Corrections.
+int fastCorrection = 0;
+int turboCorrection = 0;
 
-// Write a gap of i short pulses.
-void gap(int i) {
-  int j = 0;
 
-  for (j = 0; j < i; j++)
-    sp();
-}//gap
+void writeLongPulse_(FILE *output, uint32_t *size, bool const invert) {
+  for (int i = 0; i < longUp; ++i) {
+    writeBit(output, false, invert);
+  }
+  for (int i = 0; i < longDown; ++i) {
+    writeBit(output, true, invert);
+  }
+  *size += longUp + longDown;
+}
 
-// Write a tapemark of i long pulses, i short pulses and one long pulse.
-void tapemark(int i) {
-  int j = 0;
+void writeShortPulse_(FILE *output, uint32_t *size, bool const invert) {
+  for (int i = 0; i < shortUp; ++i) {
+    writeBit(output, false, invert);
+  }
+  for (int i = 0; i < shortDown; ++i) {
+    writeBit(output, true, invert);
+  }
+  *size += shortUp + shortDown;
+}
 
-  for (j = 0; j < i; j++)
-    lp();
-  for (j = 0; j < i; j++)
-    sp();
-  lp();
-  lp();
-}//tapemark
 
-// Write the checksum.
-void writecs(word cs) {
-  byte i = 0x0;
-  int j = 0;
+void writeGap(FILE *output, uint32_t *size, int const n, bool const invert) {
+  for (int i = 0; i < n; ++i) {
+    writeShortPulse_(output, size, invert);
+  }
+}
 
-  cs &= 0xffff;
-  for (j = 0x3; j; j >>= 1) {    // for (j = 0; j < 2; j++)
-    for (i = 0xff; i; i >>= 1) { // for (i = 0; i < 8; i++)
-      if (cs & 0x8000)           // If the most significant bit is set
-        lp();                    // wite a one.
-      else
-        sp();                    // Else write a zero.
-      cs <<= 1;                  // Go to the next bit.
-    }//for
-    lp();
-  }//for
-  lp();
-}//writecs
+void writeTapeMark(FILE *output, uint32_t *size, int const n, bool const invert) {
+  for (int i = 0; i < n; ++i) {
+    writeLongPulse_(output, size, invert);
+  }
+  for (int i = 0; i < n; ++i) {
+    writeShortPulse_(output, size, invert);
+  }
+  writeLongPulse_(output, size, invert);
+  writeLongPulse_(output, size, invert);
+}
 
-// Define the waveform to use.
-void setspeed(int i) {
-  switch (i) {
-    case 1: // Fastest in normal mode. Probably unstable...
-      LONG_UP = FAST_LONG_UP + corr_1;
-      LONG_DOWN = FAST_LONG_DOWN + corr_1;
-      SHORT_UP = FAST_SHORT_UP + corr_1;
-      SHORT_DOWN = FAST_SHORT_DOWN + corr_1;
+void writeChecksum(FILE *output, uint32_t *size, uint16_t const checksum, bool const invert) {
+  uint16_t checksum_ = checksum;
+
+  checksum_ &= 0xffff;
+  for (uint8_t i = 0; i < 2; ++i) {
+    for (uint8_t j = 0; j < 8; ++j) {
+      if (checksum_ & 0x8000) {
+        writeLongPulse_(output, size, invert);
+      }
+      else {
+        writeShortPulse_(output, size, invert);
+      }
+      checksum_ <<= 1;
+    }
+    writeLongPulse_(output, size, invert);
+  }
+  writeLongPulse_(output, size, invert);
+}
+
+void setSpeed(Speed const speed) {
+  switch (speed) {
+    case normal:
+      longUp = defaultLongUp;
+      longDown = defaultLongDown;
+      shortUp = defaultShortUp;
+      shortDown = defaultShortDown;
       break;
-    case 2: // Turbo mode 2x.
-      LONG_UP = TURBO_2_LONG_UP;
-      LONG_DOWN = TURBO_2_LONG_DOWN;
-      SHORT_UP = TURBO_2_SHORT_UP;
-      SHORT_DOWN = TURBO_2_SHORT_DOWN;
+    case fastNormal:
+      longUp = fastLongUp + fastCorrection;
+      longDown = fastLongDown + fastCorrection;
+      shortUp = fastShortUp + fastCorrection;
+      shortDown = fastShortDown + fastCorrection;
       break;
-    case 3: // Turbo mode 3x.
-      LONG_UP = TURBO_3_LONG_UP;
-      LONG_DOWN = TURBO_3_LONG_DOWN;
-      SHORT_UP = TURBO_3_SHORT_UP;
-      SHORT_DOWN = TURBO_3_SHORT_DOWN;
+    case turbo2:
+      longUp = turbo2LongUp;
+      longDown = turbo2LongDown;
+      shortUp = turbo2ShortUp;
+      shortDown = turbo2ShortDown;
       break;
-    case 4: // Fastest in turbo mode. Probably unstable...
-      LONG_UP = TURBO_FAST_LONG_UP;
-      LONG_DOWN = TURBO_FAST_LONG_DOWN + corr_2;
-      SHORT_UP = TURBO_FAST_SHORT_UP;
-      SHORT_DOWN = TURBO_FAST_SHORT_DOWN + corr_2;
+    case turbo3:
+      longUp = turbo3LongUp;
+      longDown = turbo3LongDown;
+      shortUp = turbo3ShortUp;
+      shortDown = turbo3ShortDown;
       break;
-    default: // Normal mode.
-      LONG_UP = DEFAULT_LONG_UP;
-      LONG_DOWN = DEFAULT_LONG_DOWN;
-      SHORT_UP = DEFAULT_SHORT_UP;
-      SHORT_DOWN = DEFAULT_SHORT_DOWN;
-  }//switch
-  LONG_UP = LONG_UP / divider;
-  LONG_DOWN = LONG_DOWN / divider;
-  SHORT_UP = SHORT_UP / divider;
-  SHORT_DOWN = SHORT_DOWN / divider;
-}//setspeed
+    case fastTurbo:
+      longUp = turboFastLongUp;
+      longDown = turboFastLongDown + turboCorrection;
+      shortUp = turboFastShortUp;
+      shortDown = turboFastShortDown + turboCorrection;
+      break;
+  }
+  longUp = longUp / waveScale;
+  longDown = longDown / waveScale;
+  shortUp = shortUp / waveScale;
+  shortDown = shortDown / waveScale;
+}
 
-// Write a byte and count the ones for the checksum.
-word writebyte(byte b) {
-  word cs = 0x0;
-  byte i = 0x0;
+uint16_t writeByte(FILE *output, uint32_t *size, uint8_t const data, bool const invert) {
+  uint16_t ones = 0;
+  uint8_t data_ = data;
 
-  for (i = 0xff; i; i >>= 1) {
-    if (b & 0x80) {
-      lp();
-      cs++;
-    }//if
+  for (uint8_t i = 0; i < 8; ++i) {
+    if (data_ & 0x80) {
+      writeLongPulse_(output, size, invert);
+      ++ones;
+    }
     else
-      sp();
-    b <<= 1;
-  }//for
-  lp();
-  return cs;
-}//writebyte
+      writeShortPulse_(output, size, invert);
+    data_ <<= 1;
+  }
+  writeLongPulse_(output, size, invert);
 
-// Get the file size.
-word getfilesize(byte *image) {
+  return ones;
+}
+
+uint16_t getFileSize(uint8_t const *const image) {  // TODO rename to imageSize
   return image[0x12] | (image[0x13] << 8);
-}//getfilesize
+}
 
-// See if the MZF file is valid.
-int assert(byte *image, word i) {
-  word fs = getfilesize(image);
+int checkImage(uint8_t const *const image, uint16_t const size) {
+  uint16_t imageSize = getFileSize(image);
 
-  if (fs + 0x80 != i) {
-    if (i - fs > 0x200)
+  if (imageSize + 0x80 != size) {
+    if (size - imageSize > 0x200)
       return 2;
-    if (i < fs)
+    if (size < imageSize)
       return 2;
     return 1;
-  }//if
+  }
   return 0;
-}//assert
+}

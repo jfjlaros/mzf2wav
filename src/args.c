@@ -4,14 +4,11 @@
 #include "args.h"
 #include "methods.h"
 
-// Externs.
-extern int speed_1,
-           speed_2,
-           corr_1,
-           corr_2;
+extern Speed firstStageSpeed;
 extern char *filename,
             *outfile;
-extern void (*method)(byte *);
+extern void (*method)(uint8_t const *const, bool const);
+extern bool invert;
 
 // Private function prototypes.
 int chtoi(char *), // Convert the first char of a string to an integer.
@@ -88,7 +85,7 @@ int setvars(int argc, char **argv) {
             printf("No valid initial speed given.\n");
             error(1);
           }//if
-          speed_1 = temp;
+          firstStageSpeed = temp;
           i++;
           break;
         case 't':                                   // Turbo write speed.
@@ -97,7 +94,7 @@ int setvars(int argc, char **argv) {
             printf("No valid turbo speed given.\n");
             error(1);
           }//if
-          speed_2 = temp;
+          secondStageSpeed = temp;
           i++;
           break;
         case '1':                                   // Initial fast correction.
@@ -106,7 +103,7 @@ int setvars(int argc, char **argv) {
             printf("No valid fast initial correction given.\n");
             error(1);
           }//if
-          corr_1 = temp;
+          fastCorrection = temp;
           i++;
           break;
         case '2':                                   // Initial fast correction.
@@ -115,7 +112,7 @@ int setvars(int argc, char **argv) {
             printf("No valid fast turbo correction given.\n");
             error(1);
           }//if
-          corr_2 = temp;
+          turboCorrection = temp;
           i++;
           break;
         case 'b':                                   // Bit rate.
@@ -125,20 +122,21 @@ int setvars(int argc, char **argv) {
             printf("No valid bit rate given.\n");
             error(1);
           }//if
-          setbitrate((uint32_t)temp);
+          setBitrate((uint32_t)temp);
           i++;
           break;
         case 'c':
-          method = conv;
+          method = conventionalTransfer;
           break;
         case 's':
-          method = trans;
+          method = fastTransfer;
           break;
         case 'w':
-          method = turbo;
+          method = turboTransfer;
           break;
         case 'p':
-          reversepol();
+          //reversePolarity();
+          invert = true;
           break;
         default:
           printf("Unknown option: %s\n", argv[i]);

@@ -1,16 +1,10 @@
-#include <stdio.h>
 #include "wav.h"
 #include "physical.h"
 
-// Externs.
-extern FILE *OUT;
-
-// Global variables.
-dword fs = 0;
-int divider = 1;
+int waveScale = 1;
 
 // Numbers are little endian.
-byte header[44] = {
+uint8_t header[] = {
   'R', 'I', 'F', 'F',       // File description header.
   0x00, 0x00, 0x00, 0x00,   // Filesize - 8.
   'W', 'A', 'V', 'E',       // "WAVE" Description header.
@@ -23,47 +17,46 @@ byte header[44] = {
   0x01, 0x00,               // Block alignment.
   0x08, 0x00,               // Bits per sample.
   'd', 'a', 't', 'a',       // "data" Description header.
-  0x00, 0x00, 0x00, 0x00 }; // Size of data chunk.
+  0x00, 0x00, 0x00, 0x00};  // Size of data chunk.
+
+uint8_t const zero = 0x30;
+uint8_t const one = 0xd0;
 
 
-// Public functions.
-void setbitrate(uint32_t bitrate) {
-  int i;
-
-  for (i = 0; i < 4; i++) {
+void setBitrate(uint32_t bitrate) {
+  for (int i = 0; i < 4; ++i) {
     header[i + 24] = bitrate >> (8 * i) & 0xff;
     header[i + 28] = bitrate >> (8 * i) & 0xff;
   }
-  divider = 44100 / bitrate;
+  waveScale = 44100 / bitrate;  // TODO: return this value.
 }
 
-void outb(int value, int port) {
-  fprintf(OUT, "%c", value);
-}//outb
+void writeBit(FILE *output, bool const bit, bool const invert) {
+  if (bit != invert) {
+    fprintf(output, "%c", one);
+    return;
+  }
+  fprintf(output, "%c", zero);
+}
 
-// Write the WAV header.
-void writewavheader(void) {
-  int i = 0;
+void writeHeader(FILE *output) {  // TODO: combine with next function?
+  for (uint8_t i = 0; i < 44; ++i) {
+    fprintf(output, "%c", header[i]);
+  }
+}
 
-  for (i = 0; i < 44; i++)
-    fprintf(OUT, "%c", header[i]);
-}//writewavheader
-
-// Set the filesizes in the WAV header.
-void setheader(void) {
-  dword temp = fs;
-  int i = 0;
-
-  fseek(OUT, 4, SEEK_SET);
-  fprintf(OUT, "%c", (temp & 0xff) + 36);
-  fseek(OUT, 40, SEEK_SET);
-  fprintf(OUT, "%c", temp & 0xff);
-  temp >>= 8;
-  for (i = 1; i < 4; i++) {
-    fseek(OUT, 4 + i, SEEK_SET);
-    fprintf(OUT, "%c", temp & 0xff);
-    fseek(OUT, 40 + i, SEEK_SET);
-    fprintf(OUT, "%c", temp & 0xff);
-    temp >>= 8;
-  }//for
-}//setheader
+void setHeader(FILE *output, uint32_t const size) {
+  fseek(output, 4, SEEK_SET);
+  uint32_t size_ = size;
+  fprintf(output, "%c", (size_ & 0xff) + 36);
+  fseek(output, 40, SEEK_SET);
+  fprintf(output, "%c", size_ & 0xff);
+  size_ >>= 8;
+  for (uint8_t i = 1; i < 4; ++i) {
+    fseek(output, 4 + i, SEEK_SET);
+    fprintf(output, "%c", size_ & 0xff);
+    fseek(output, 40 + i, SEEK_SET);
+    fprintf(output, "%c", size_ & 0xff);
+    size_ >>= 8;
+  }
+}

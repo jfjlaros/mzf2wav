@@ -1,24 +1,27 @@
+#include <string.h>
+
 #include "methods.h"
 
-// Global variables.
-int speed_2 = 2;
+extern FILE *OUT;  // TODO
+uint32_t fileSize = 0;
 
-// Defenitions.
-// This is the turbo loader in MZF format.
-byte program[300] = {
-  0x01,                                                 // Program type.
+Speed secondStageSpeed = turbo2;
 
-  0x0d, 0x0d, 0x0d, 0x0d, 0x0d,                         // Room for the
-  0x0d, 0x0d, 0x0d, 0x0d, 0x0d,                         // image name.
+// Turbo loader in MZF format.
+uint8_t program[] = {
+  0x01,                                                  // Program type.
+
+  0x0d, 0x0d, 0x0d, 0x0d, 0x0d,                          // Room for the
+  0x0d, 0x0d, 0x0d, 0x0d, 0x0d,                          // image name.
   0x0d, 0x0d, 0x0d, 0x0d, 0x0d, 0x0d, 0x0d,
 
-  0x5a, 0x00,                                           // File size.
-  0x00, 0xd4,                                           // Load adress.
-  0x00, 0xd4,                                           // Execution adress.
-  '[', 't', 'u', 'r', 'b', 'o', ']',                    // The first 7 bytes.
+  0x5a, 0x00,                                            // File size.
+  0x00, 0xd4,                                            // Load address.
+  0x00, 0xd4,                                            // Execution address.
+  '[', 't', 'u', 'r', 'b', 'o', ']',                     // The first 7 bytes.
 
-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // Room for comment.
-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // minus 7 bytes.
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // Room for comment.
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // minus 7 bytes.
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -29,7 +32,7 @@ byte program[300] = {
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   0x00, 0x00, 0x00, 0x00, 0x00,
 
-  0xcd, 0x00,                                           // End Header.
+  0xcd, 0x00,                                            // End Header.
 
   // Begin Program.
   0x3e, 0x08,       // D400: LD A, 08h
@@ -84,77 +87,78 @@ byte program[300] = {
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 // + the first 7 bytes of comment.
 };
 
-// Public functions.
-// Transfer file the fast way.
-void trans(byte *image) {
-  word cs = 0x0,
-       fs = getfilesize(image),
-       i = 0x0;
 
-  gap(4000);                      // Longish gap.
-  tapemark(40);                   // Long tapemark.
+void fastTransfer(uint8_t const *const image, bool const invert) {
+  writeGap(OUT, &fileSize, 4000, invert);
+  writeTapeMark(OUT, &fileSize, 40, invert);
 
-  for (i = 0x0; i < 0x80; i++)    // The mzf header.
-    cs += writebyte(image[i]);
-  writecs(cs);                    // The checksum of the mzf header.
+  // Header.
+  uint16_t checkSum = 0;
+  for (uint8_t i = 0; i < 128; ++i) {
+    checkSum += writeByte(OUT, &fileSize, image[i], invert);
+  }
+  writeChecksum(OUT, &fileSize, checkSum, invert);
 
-  gap(5000);                      // Shortish gap.
-  tapemark(20);                   // Short tapemark.
+  writeGap(OUT, &fileSize, 5000, invert);
+  writeTapeMark(OUT, &fileSize, 20, invert);
 
-  cs = 0x0;
-  fs += 0x80;
-  for (i = 0x80; i < fs; i++)      // The mzf body.
-    cs += writebyte(image[i]);
-  writecs(cs);                    // The checksum of the mzf body.
-}//trans
+  // Body.
+  uint16_t size = getFileSize(image) + 128;
+  checkSum = 0;
+  for (uint16_t i = 128; i < size; ++i) {
+    checkSum += writeByte(OUT, &fileSize, image[i], invert);
+  }
+  writeChecksum(OUT, &fileSize, checkSum, invert);
+}
 
-// Transfer the file the conventional way.
-void conv(byte *image) {
-  word cs = 0x0,
-       fs = getfilesize(image),
-       i = 0x0;
+void conventionalTransfer(uint8_t const *const image, bool const invert) {
+  writeGap(OUT, &fileSize, 22000, invert);
+  writeTapeMark(OUT, &fileSize, 40, invert);
 
-  gap(22000);                     // Long gap.
-  tapemark(40);                   // Long tapemark.
+  // Header.
+  uint16_t checkSum = 0;
+  for (uint8_t i = 0; i < 128; ++i) {
+    checkSum += writeByte(OUT, &fileSize, image[i], invert);
+  }
+  writeChecksum(OUT, &fileSize, checkSum, invert);
 
-  for (i = 0x0; i < 0x80; i++)    // The mzf header.
-    cs += writebyte(image[i]);
-  writecs(cs);                    // The checksum of the mzf header.
+  writeGap(OUT, &fileSize, 256, invert);
 
-  gap(256);                       // 256 short pulses.
+  // Copy of the header.
+  for (uint8_t i = 0; i < 128; ++i) {
+    writeByte(OUT, &fileSize, image[i], invert);
+  }
+  writeChecksum(OUT, &fileSize, checkSum, invert);
 
-  for (i = 0x0; i < 0x80; i++)    // The copy of the mzf header.
-    writebyte(image[i]);
-  writecs(cs);                    // The copy of the checksum of the mzf header.
+  writeGap(OUT, &fileSize, 11000, invert);
+  writeTapeMark(OUT, &fileSize, 20, invert);
 
-  gap(11000);                     // Short gap.
-  tapemark(20);                   // Short tapemark.
+  // Body.
+  uint16_t size = getFileSize(image) + 128;
+  checkSum = 0;
+  for (uint16_t i = 128; i < size; ++i) {
+    checkSum += writeByte(OUT, &fileSize, image[i], invert);
+  }
+  writeChecksum(OUT, &fileSize, checkSum, invert);
 
-  cs = 0x0;
-  fs += 0x80;
-  for (i = 0x80; i < fs; i++)     // The mzf body.
-    cs += writebyte(image[i]);
-  writecs(cs);                    // The checksum of the body.
+  writeGap(OUT, &fileSize, 256, invert);
 
-  gap(256);                       // 256 short pulses.
+  // Copy of the body.
+  for (uint16_t i = 128; i < size; ++i) {
+    writeByte(OUT, &fileSize, image[i], invert);
+  }
+  writeChecksum(OUT, &fileSize, checkSum, invert);
+}
 
-  for (i = 0x80; i < fs; i++)     // The copy of the mzf body.
-    writebyte(image[i]);
-  writecs(cs);                    // The copy of checksum of the body.
-}//conv
+void turboTransfer(uint8_t const *const image, bool const invert) {
+  // Name.
+  memcpy(program + 1, image + 1, 17);
+  // Comment.
+  memcpy(program + 31, image + 31, 97);
+  // Info.
+  memcpy(program + 205, image + 18, 13);
 
-// First write a turbo loader, then write the image at high speed.
-void turbo(byte *image) {
-  int j = 0;
-
-  for (j = 0x1; j < 0x12; j++)    // Copy the name.
-    program[j] = image[j];
-  for (j = 0x1f; j < 0x80; j++)   // Copy the comment.
-    program[j] = image[j];
-  for (j = 0x12; j < 0x1f; j++)   // Copy the info.
-    program[j + 0x3b + 0x80] = image[j];
-
-  trans(program);
-  setspeed(speed_2);
-  trans(image);
-}//turbo
+  fastTransfer(program, invert);
+  setSpeed(secondStageSpeed);
+  fastTransfer(image, invert);
+}
