@@ -7,8 +7,10 @@
 extern Speed firstStageSpeed;
 extern char *filename,
             *outfile;
-extern void (*method)(uint8_t const *const, bool const);
+extern void (*method)(uint8_t const *const, Waveform *const);
 extern bool invert;
+extern int waveScale; // TODO
+extern int bitrate;
 
 // Private function prototypes.
 int chtoi(char *), // Convert the first char of a string to an integer.
@@ -103,7 +105,7 @@ int setvars(int argc, char **argv) {
             printf("No valid fast initial correction given.\n");
             error(1);
           }//if
-          fastCorrection = temp;
+          //fastCorrection = temp;
           i++;
           break;
         case '2':                                   // Initial fast correction.
@@ -112,7 +114,7 @@ int setvars(int argc, char **argv) {
             printf("No valid fast turbo correction given.\n");
             error(1);
           }//if
-          turboCorrection = temp;
+          //turboCorrection = temp;
           i++;
           break;
         case 'b':                                   // Bit rate.
@@ -122,7 +124,9 @@ int setvars(int argc, char **argv) {
             printf("No valid bit rate given.\n");
             error(1);
           }//if
-          setBitrate((uint32_t)temp);
+          //waveScale = setBitrate((uint32_t)temp);
+          bitrate = temp;
+          waveScale = 44100 / temp;
           i++;
           break;
         case 'c':

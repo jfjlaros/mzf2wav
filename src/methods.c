@@ -4,6 +4,7 @@
 
 extern FILE *OUT;  // TODO
 uint32_t fileSize = 0;
+int waveScale = 1;
 
 Speed secondStageSpeed = turbo2;
 
@@ -88,69 +89,71 @@ uint8_t program[] = {
 };
 
 
-void fastTransfer(uint8_t const *const image, bool const invert) {
-  writeGap(OUT, &fileSize, 4000, invert);
-  writeTapeMark(OUT, &fileSize, 40, invert);
+void fastTransfer(uint8_t const *const image, Waveform *const waveform) {
+  writeGap(OUT, &fileSize, 4000, waveform);
+  writeTapeMark(OUT, &fileSize, 40, waveform);
 
   // Header.
   uint16_t checkSum = 0;
   for (uint8_t i = 0; i < 128; ++i) {
-    checkSum += writeByte(OUT, &fileSize, image[i], invert);
+    checkSum += writeByte(OUT, &fileSize, image[i], waveform);
   }
-  writeChecksum(OUT, &fileSize, checkSum, invert);
+  writeChecksum(OUT, &fileSize, checkSum, waveform);
 
-  writeGap(OUT, &fileSize, 5000, invert);
-  writeTapeMark(OUT, &fileSize, 20, invert);
+  writeGap(OUT, &fileSize, 5000, waveform);
+  writeTapeMark(OUT, &fileSize, 20, waveform);
 
   // Body.
-  uint16_t size = getFileSize(image) + 128;
+  uint16_t size = getImageSize(image) + 128;
   checkSum = 0;
   for (uint16_t i = 128; i < size; ++i) {
-    checkSum += writeByte(OUT, &fileSize, image[i], invert);
+    checkSum += writeByte(OUT, &fileSize, image[i], waveform);
   }
-  writeChecksum(OUT, &fileSize, checkSum, invert);
+  writeChecksum(OUT, &fileSize, checkSum, waveform);
 }
 
-void conventionalTransfer(uint8_t const *const image, bool const invert) {
-  writeGap(OUT, &fileSize, 22000, invert);
-  writeTapeMark(OUT, &fileSize, 40, invert);
+void conventionalTransfer(
+    uint8_t const *const image, Waveform *const waveform) {
+  writeGap(OUT, &fileSize, 22000, waveform);
+  writeTapeMark(OUT, &fileSize, 40, waveform);
 
   // Header.
   uint16_t checkSum = 0;
   for (uint8_t i = 0; i < 128; ++i) {
-    checkSum += writeByte(OUT, &fileSize, image[i], invert);
+    checkSum += writeByte(OUT, &fileSize, image[i], waveform);
   }
-  writeChecksum(OUT, &fileSize, checkSum, invert);
+  writeChecksum(OUT, &fileSize, checkSum, waveform);
 
-  writeGap(OUT, &fileSize, 256, invert);
+  writeGap(OUT, &fileSize, 256, waveform);
 
   // Copy of the header.
   for (uint8_t i = 0; i < 128; ++i) {
-    writeByte(OUT, &fileSize, image[i], invert);
+    writeByte(OUT, &fileSize, image[i], waveform);
   }
-  writeChecksum(OUT, &fileSize, checkSum, invert);
+  writeChecksum(OUT, &fileSize, checkSum, waveform);
 
-  writeGap(OUT, &fileSize, 11000, invert);
-  writeTapeMark(OUT, &fileSize, 20, invert);
+  writeGap(OUT, &fileSize, 11000, waveform);
+  writeTapeMark(OUT, &fileSize, 20, waveform);
 
   // Body.
-  uint16_t size = getFileSize(image) + 128;
+  uint16_t size = getImageSize(image) + 128;
   checkSum = 0;
   for (uint16_t i = 128; i < size; ++i) {
-    checkSum += writeByte(OUT, &fileSize, image[i], invert);
+    checkSum += writeByte(OUT, &fileSize, image[i], waveform);
   }
-  writeChecksum(OUT, &fileSize, checkSum, invert);
+  writeChecksum(OUT, &fileSize, checkSum, waveform);
 
-  writeGap(OUT, &fileSize, 256, invert);
+  writeGap(OUT, &fileSize, 256, waveform);
 
   // Copy of the body.
   for (uint16_t i = 128; i < size; ++i) {
-    writeByte(OUT, &fileSize, image[i], invert);
+    writeByte(OUT, &fileSize, image[i], waveform);
   }
-  writeChecksum(OUT, &fileSize, checkSum, invert);
+  writeChecksum(OUT, &fileSize, checkSum, waveform);
 }
 
-void turboTransfer(uint8_t const *const image, bool const invert) {
+void turboTransfer(
+    uint8_t const *const image, Waveform *const waveform) {
   // Name.
   memcpy(program + 1, image + 1, 17);
   // Comment.
@@ -158,7 +161,9 @@ void turboTransfer(uint8_t const *const image, bool const invert) {
   // Info.
   memcpy(program + 205, image + 18, 13);
 
-  fastTransfer(program, invert);
-  setSpeed(secondStageSpeed);
-  fastTransfer(image, invert);
+  fastTransfer(program, waveform);
+  //setSpeed(secondStageSpeed, waveScale);
+  configureWaveform(
+    waveform, secondStageSpeed, 42000, waveform->invert, 0);
+  fastTransfer(image, waveform);
 }

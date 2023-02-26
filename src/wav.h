@@ -2,13 +2,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-extern int waveScale;
-
-/*! Set WAV bitrate.
- *
- * \param bitrate Bitrate.
- */
-void setBitrate(uint32_t bitrate);
 
 /*! Write one bit.
  *
@@ -18,15 +11,16 @@ void setBitrate(uint32_t bitrate);
  */
 void writeBit(FILE *output, bool const bit, bool const invert);
 
-/*! Write a WAV header.
+/*! Write the WAV header.
  *
  * \param output Output file.
  */
 void writeHeader(FILE *output);
 
-/*! Set filesizes in the WAV header.
+/*! Update the WAV header.
  *
  * \param output Output file.
  * \param size File size.
+ * \param bitrate Bitrate.
  */
-void setHeader(FILE *output, uint32_t const size);
+void updateHeader(FILE *output, uint32_t const size, uint32_t const bitrate);

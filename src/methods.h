@@ -1,24 +1,25 @@
 #include "physical.h"
 
-extern Speed secondStageSpeed;
+extern Speed secondStageSpeed;  // TODO: remove
 
 /*! Fast file transfer.
  *
  * \param image MZF image.
- * \param invert Invert polarity.
+ * \param waveform Waveform.
  */
-void fastTransfer(uint8_t const *const image, bool const invert);
+void fastTransfer(uint8_t const *const image, Waveform *const waveform);
 
 /*! Conventional file transfer.
  *
  * \param image MZF image.
- * \param invert Invert polarity.
+ * \param waveform Waveform.
  */
-void conventionalTransfer(uint8_t const *const image, bool const invert);
+void conventionalTransfer(
+  uint8_t const *const image, Waveform *const waveform);
 
 /*! Turbo file transfer.
  *
  * \param image MZF image.
- * \param invert Invert polarity.
+ * \param waveform Waveform.
  */
-void turboTransfer(uint8_t const *const image, bool const invert);
+void turboTransfer(uint8_t const *const image, Waveform *const waveform);

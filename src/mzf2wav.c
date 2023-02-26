@@ -5,14 +5,17 @@
 #include "args.h"
 
 extern uint32_t fileSize; // TODO
+extern int waveScale; // TODO
 bool invert = false;  // TODO
+
+int bitrate = 44356; // TODO Should be 44100
 
 // Global variables.
 FILE *OUT = NULL;
 Speed firstStageSpeed = normal;
 char *filename = NULL,
      *outfile = NULL;
-void (*method)(uint8_t const *const, bool const) = fastTransfer;
+void (*method)(uint8_t const *const, Waveform *const) = fastTransfer;
 
 
 // Read the file into memory.
@@ -79,11 +82,13 @@ int main(int argc, char **argv) {
   while (fread(&image[i], 1, 1, IN))
     i++;
 
-  setSpeed(firstStageSpeed);
-
   writeHeader(OUT);
-  method(image, invert);
-  setHeader(OUT, fileSize);
+
+  Waveform waveform;
+  configureWaveform(&waveform, firstStageSpeed, 42000, invert, 0);  // TODO.
+  method(image, &waveform);
+
+  updateHeader(OUT, fileSize, bitrate);
 
   fclose(OUT);
   free(image);
