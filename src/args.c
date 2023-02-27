@@ -7,7 +7,7 @@
 extern Speed firstStageSpeed;
 extern char *filename,
             *outfile;
-extern void (*method)(uint8_t const *const, Waveform *const);
+extern void (*method)(uint8_t const *const, Waveform const *const);
 extern bool invert;
 extern int waveScale; // TODO
 extern int bitrate;

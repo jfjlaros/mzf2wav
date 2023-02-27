@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -O2 -static
+CFLAGS = -Wall -Wextra -pedantic -O2 -static
 
 EXEC = mzf2wav
 MAIN = ../mzf2wav.c

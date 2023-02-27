@@ -9,7 +9,7 @@ int waveScale = 1;
 Speed secondStageSpeed = turbo2;
 
 // Turbo loader in MZF format.
-uint8_t program[] = {
+uint8_t program[] = {  // TODO: make const
   0x01,                                                  // Program type.
 
   0x0d, 0x0d, 0x0d, 0x0d, 0x0d,                          // Room for the
@@ -89,7 +89,7 @@ uint8_t program[] = {
 };
 
 
-void fastTransfer(uint8_t const *const image, Waveform *const waveform) {
+void fastTransfer(uint8_t const *const image, Waveform const *const waveform) {
   writeGap(OUT, &fileSize, 4000, waveform);
   writeTapeMark(OUT, &fileSize, 40, waveform);
 
@@ -113,7 +113,7 @@ void fastTransfer(uint8_t const *const image, Waveform *const waveform) {
 }
 
 void conventionalTransfer(
-    uint8_t const *const image, Waveform *const waveform) {
+    uint8_t const *const image, Waveform const *const waveform) {
   writeGap(OUT, &fileSize, 22000, waveform);
   writeTapeMark(OUT, &fileSize, 40, waveform);
 
@@ -153,7 +153,7 @@ void conventionalTransfer(
 }
 
 void turboTransfer(
-    uint8_t const *const image, Waveform *const waveform) {
+    uint8_t const *const image, Waveform const *const waveform) {
   // Name.
   memcpy(program + 1, image + 1, 17);
   // Comment.
@@ -162,8 +162,8 @@ void turboTransfer(
   memcpy(program + 205, image + 18, 13);
 
   fastTransfer(program, waveform);
-  //setSpeed(secondStageSpeed, waveScale);
+  Waveform waveform_ = *waveform;
   configureWaveform(
-    waveform, secondStageSpeed, 42000, waveform->invert, 0);
+    &waveform_, secondStageSpeed, 42000, waveform->invert, 0);
   fastTransfer(image, waveform);
 }

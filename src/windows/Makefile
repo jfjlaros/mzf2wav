@@ -1,5 +1,5 @@
-CC = x86_64-w64-mingw32-c++
-CFLAGS = -Wall -O2 -static
+CC = x86_64-w64-mingw32-gcc
+CFLAGS = -Wall -Wextra -pedantic -O2 -static
 
 EXEC = mzf2wav.exe
 MAIN = ../mzf2wav.c

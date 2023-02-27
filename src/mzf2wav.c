@@ -15,7 +15,7 @@ FILE *OUT = NULL;
 Speed firstStageSpeed = normal;
 char *filename = NULL,
      *outfile = NULL;
-void (*method)(uint8_t const *const, Waveform *const) = fastTransfer;
+void (*method)(uint8_t const *const, Waveform const *const) = fastTransfer;
 
 
 // Read the file into memory.

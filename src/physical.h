@@ -62,13 +62,6 @@ void writeChecksum(
 
 /*! Define the waveform to use.
  *
- * \param speed Speed.
- * \param waveScale Wave scaling factor.
-void setSpeed(Speed const speed, int const waveScale);
- */
-
-/*! Define the waveform to use.
- *
  * \param waveForm Waveform.
  * \param waveScale Wave scaling factor.
  * \param speed Speed.

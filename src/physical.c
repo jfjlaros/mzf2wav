@@ -52,7 +52,7 @@ uint16_t writeByte(
   uint16_t ones = 0;
 
   for (uint8_t i = 0; i < 8; ++i) {
-    if (data & 1 << (7 - i)) {
+    if (data & 0x80 >> i) {
       writeLongPulse_(output, size, waveform);
       ++ones;
     }
@@ -72,7 +72,7 @@ void writeChecksum(
   writeLongPulse_(output, size, waveform);
 }
 
-void configureWaveform(
+void configureWaveform(  // TODO
     Waveform *waveform, Speed const speed, int const bitrate,
     bool const invert, int const correction) {
   *waveform = waveforms_[speed];
@@ -100,7 +100,7 @@ uint16_t getImageSize(uint8_t const *const image) {
   return image[0x12] | image[0x13] << 8;
 }
 
-int checkImage(uint8_t const *const image, uint16_t const size) {
+int checkImage(uint8_t const *const image, uint16_t const size) {  // TODO
   uint16_t imageSize = getImageSize(image);
 
   if (imageSize + 0x80 != size) {
