@@ -4,22 +4,33 @@ extern Speed secondStageSpeed;  // TODO: remove
 
 /*! Fast file transfer.
  *
+ * \param output Output file.
  * \param image MZF image.
- * \param waveform Waveform.
+ * \param wfc Waveform config.
+ *
+ * \return Number of bytes written.
  */
-void fastTransfer(uint8_t const *const image, Waveform const *const waveform);
+uint32_t fastTransfer(
+  FILE *output, uint8_t const *const image, WaveCfgPtr wfc);
 
 /*! Conventional file transfer.
  *
+ * \param output Output file.
  * \param image MZF image.
- * \param waveform Waveform.
+ * \param wfc Waveform config.
+ *
+ * \return Number of bytes written.
  */
-void conventionalTransfer(
-  uint8_t const *const image, Waveform const *const waveform);
+uint32_t conventionalTransfer(
+  FILE *output, uint8_t const *const image, WaveCfgPtr wfc);
 
 /*! Turbo file transfer.
  *
+ * \param output Output file.
  * \param image MZF image.
- * \param waveform Waveform.
+ * \param wfc Waveform config.
+ *
+ * \return Number of bytes written.
  */
-void turboTransfer(uint8_t const *const image, Waveform const *const waveform);
+uint32_t turboTransfer(
+  FILE *output, uint8_t const *const image, WaveCfgPtr wfc);

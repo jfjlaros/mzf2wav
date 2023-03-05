@@ -2,14 +2,8 @@
 
 #include "methods.h"
 
-extern FILE *OUT;  // TODO
-uint32_t fileSize = 0;
-int waveScale = 1;
-
-Speed secondStageSpeed = turbo2;
-
 // Turbo loader in MZF format.
-uint8_t program[] = {  // TODO: make const
+uint8_t const program_[] = {
   0x01,                                                  // Program type.
 
   0x0d, 0x0d, 0x0d, 0x0d, 0x0d,                          // Room for the
@@ -89,71 +83,85 @@ uint8_t program[] = {  // TODO: make const
 };
 
 
-void fastTransfer(uint8_t const *const image, Waveform const *const waveform) {
-  writeGap(OUT, &fileSize, 4000, waveform);
-  writeTapeMark(OUT, &fileSize, 40, waveform);
+uint32_t fastTransfer(
+    FILE *output, uint8_t const *const image, WaveCfgPtr wfc) {
+  uint32_t bytesWritten = 0;
+
+  writeGap(output, &bytesWritten, 4000, wfc);
+  writeTapeMark(output, &bytesWritten, 40, wfc);
 
   // Header.
   uint16_t checkSum = 0;
   for (uint8_t i = 0; i < 128; ++i) {
-    checkSum += writeByte(OUT, &fileSize, image[i], waveform);
+    checkSum += writeByte(output, &bytesWritten, image[i], wfc);
   }
-  writeChecksum(OUT, &fileSize, checkSum, waveform);
+  writeChecksum(output, &bytesWritten, checkSum, wfc);
 
-  writeGap(OUT, &fileSize, 5000, waveform);
-  writeTapeMark(OUT, &fileSize, 20, waveform);
+  writeGap(output, &bytesWritten, 5000, wfc);
+  writeTapeMark(output, &bytesWritten, 20, wfc);
 
   // Body.
-  uint16_t size = getImageSize(image) + 128;
+  uint16_t imageSize = getImageSize(image) + 128;
   checkSum = 0;
-  for (uint16_t i = 128; i < size; ++i) {
-    checkSum += writeByte(OUT, &fileSize, image[i], waveform);
+  for (uint16_t i = 128; i < imageSize; ++i) {
+    checkSum += writeByte(output, &bytesWritten, image[i], wfc);
   }
-  writeChecksum(OUT, &fileSize, checkSum, waveform);
+  writeChecksum(output, &bytesWritten, checkSum, wfc);
+
+  return bytesWritten;
 }
 
-void conventionalTransfer(
-    uint8_t const *const image, Waveform const *const waveform) {
-  writeGap(OUT, &fileSize, 22000, waveform);
-  writeTapeMark(OUT, &fileSize, 40, waveform);
+uint32_t conventionalTransfer(
+    FILE *output, uint8_t const *const image, WaveCfgPtr wfc) {
+  uint32_t bytesWritten = 0;
+
+  writeGap(output, &bytesWritten, 22000, wfc);
+  writeTapeMark(output, &bytesWritten, 40, wfc);
 
   // Header.
   uint16_t checkSum = 0;
   for (uint8_t i = 0; i < 128; ++i) {
-    checkSum += writeByte(OUT, &fileSize, image[i], waveform);
+    checkSum += writeByte(output, &bytesWritten, image[i], wfc);
   }
-  writeChecksum(OUT, &fileSize, checkSum, waveform);
+  writeChecksum(output, &bytesWritten, checkSum, wfc);
 
-  writeGap(OUT, &fileSize, 256, waveform);
+  writeGap(output, &bytesWritten, 256, wfc);
 
   // Copy of the header.
   for (uint8_t i = 0; i < 128; ++i) {
-    writeByte(OUT, &fileSize, image[i], waveform);
+    writeByte(output, &bytesWritten, image[i], wfc);
   }
-  writeChecksum(OUT, &fileSize, checkSum, waveform);
+  writeChecksum(output, &bytesWritten, checkSum, wfc);
 
-  writeGap(OUT, &fileSize, 11000, waveform);
-  writeTapeMark(OUT, &fileSize, 20, waveform);
+  writeGap(output, &bytesWritten, 11000, wfc);
+  writeTapeMark(output, &bytesWritten, 20, wfc);
 
   // Body.
-  uint16_t size = getImageSize(image) + 128;
+  uint16_t imageSize = getImageSize(image) + 128;
   checkSum = 0;
-  for (uint16_t i = 128; i < size; ++i) {
-    checkSum += writeByte(OUT, &fileSize, image[i], waveform);
+  for (uint16_t i = 128; i < imageSize; ++i) {
+    checkSum += writeByte(output, &bytesWritten, image[i], wfc);
   }
-  writeChecksum(OUT, &fileSize, checkSum, waveform);
+  writeChecksum(output, &bytesWritten, checkSum, wfc);
 
-  writeGap(OUT, &fileSize, 256, waveform);
+  writeGap(output, &bytesWritten, 256, wfc);
 
   // Copy of the body.
-  for (uint16_t i = 128; i < size; ++i) {
-    writeByte(OUT, &fileSize, image[i], waveform);
+  for (uint16_t i = 128; i < imageSize; ++i) {
+    writeByte(output, &bytesWritten, image[i], wfc);
   }
-  writeChecksum(OUT, &fileSize, checkSum, waveform);
+  writeChecksum(output, &bytesWritten, checkSum, wfc);
+
+  return bytesWritten;
 }
 
-void turboTransfer(
-    uint8_t const *const image, Waveform const *const waveform) {
+uint32_t turboTransfer(
+    FILE *output, uint8_t const *const image, WaveCfgPtr wfc) {
+  //Speed secondStageSpeed = turbo2;  // TODO: remove
+
+  uint8_t program[sizeof(program_)];
+  memcpy(program, program_, sizeof(program_));
+
   // Name.
   memcpy(program + 1, image + 1, 17);
   // Comment.
@@ -161,9 +169,10 @@ void turboTransfer(
   // Info.
   memcpy(program + 205, image + 18, 13);
 
-  fastTransfer(program, waveform);
-  Waveform waveform_ = *waveform;
-  configureWaveform(
-    &waveform_, secondStageSpeed, 42000, waveform->invert, 0);
-  fastTransfer(image, waveform);
+  uint32_t bytesWritten = fastTransfer(output, program, wfc);
+  //Waveform waveform_ = makeWaveform(  // TODO
+  //  secondStageSpeed, 42000, waveform->invert, 0);
+  //bytesWritten += fastTransfer(output, image, &waveform_);
+
+  return bytesWritten;
 }

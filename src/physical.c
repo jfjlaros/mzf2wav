@@ -1,99 +1,85 @@
 #include "physical.h"
 
-Waveform const waveforms_[] = {
-  {{21, 21}, {11, 11}, false},   // Normal mode.
-  {{11, 21}, {11, 12}, false},   // Fastest in normal mode.
-  {{11, 11}, { 5,  6}, false},   // Turbo 2x.
-  {{ 7,  7}, { 3,  4}, false},   // Turbo 3x.
-  {{ 3,  7}, { 3,  4}, false}};  // Fastest in turbo mode.
+Waveform const waveforms[] = {
+  //{{464, 494}, {240, 264}},   // Normal mode.
+  {{480, 494}, {260, 264}},   // TODO: should be the one above.
+  {{248, 474}, {248, 271}},   // Fastest in normal mode.
+  {{248, 248}, {113, 136}},   // Turbo 2x.
+  {{158, 158}, { 68,  91}},   // Turbo 3x.
+  {{ 68, 158}, { 68,  91}}};  // Fastest in turbo mode.
 
 
-void writeLongPulse_(FILE *output, uint32_t *size, Waveform const *const waveform) {
-  for (int i = 0; i < waveform->longPulse.up; ++i) {
-    writeBit(output, false, waveform->invert);
-  }
-  for (int i = 0; i < waveform->longPulse.down; ++i) {
-    writeBit(output, true, waveform->invert);
-  }
-  *size += waveform->longPulse.up + waveform->longPulse.down;
+uint16_t pulse_(uint32_t const duration, uint16_t const bitrate) {
+  return duration * bitrate / 1000000;
 }
 
-void writeShortPulse_(FILE *output, uint32_t *size, Waveform const *const waveform) {
-  for (int i = 0; i < waveform->shortPulse.up; ++i) {
-    writeBit(output, false, waveform->invert);
+void writeLongPulse_(FILE *output, uint32_t *size, WaveCfgPtr wfc) {
+  uint16_t const up = pulse_(wfc->wave.longPulse.up, wfc->bitrate);
+  for (uint16_t i = 0; i < up; ++i) {
+    writeBit(output, false, wfc->invert);
   }
-  for (int i = 0; i < waveform->shortPulse.down; ++i) {
-    writeBit(output, true, waveform->invert);
+  uint16_t const down = pulse_(wfc->wave.longPulse.down, wfc->bitrate);
+  for (uint16_t i = 0; i < down; ++i) {
+    writeBit(output, true, wfc->invert);
   }
-  *size += waveform->shortPulse.up + waveform->shortPulse.down;
+  *size += up + down;
+}
+
+void writeShortPulse_(FILE *output, uint32_t *size, WaveCfgPtr wfc) {
+  uint16_t const up = pulse_(wfc->wave.shortPulse.up, wfc->bitrate);
+  for (uint16_t i = 0; i < up; ++i) {
+    writeBit(output, false, wfc->invert);
+  }
+  uint16_t const down = pulse_(wfc->wave.shortPulse.down, wfc->bitrate);
+  for (uint16_t i = 0; i < down; ++i) {
+    writeBit(output, true, wfc->invert);
+  }
+  *size += up + down;
 }
 
 
-void writeGap(FILE *output, uint32_t *size, int const n, Waveform const *const waveform) {
+void writeGap(FILE *output, uint32_t *size, int const n, WaveCfgPtr wfc) {
   for (int i = 0; i < n; ++i) {
-    writeShortPulse_(output, size, waveform);
+    writeShortPulse_(output, size, wfc);
   }
 }
 
 void writeTapeMark(
-    FILE *output, uint32_t *size, int const n, Waveform const *const waveform) {
+    FILE *output, uint32_t *size, int const n, WaveCfgPtr wfc) {
   for (int i = 0; i < n; ++i) {
-    writeLongPulse_(output, size, waveform);
+    writeLongPulse_(output, size, wfc);
   }
   for (int i = 0; i < n; ++i) {
-    writeShortPulse_(output, size, waveform);
+    writeShortPulse_(output, size, wfc);
   }
-  writeLongPulse_(output, size, waveform);
-  writeLongPulse_(output, size, waveform);
+  writeLongPulse_(output, size, wfc);
+  writeLongPulse_(output, size, wfc);
 }
 
 uint16_t writeByte(
-    FILE *output, uint32_t *size, uint8_t const data, Waveform const *const waveform) {
+    FILE *output, uint32_t *size, uint8_t const data, WaveCfgPtr wfc) {
   uint16_t ones = 0;
 
   for (uint8_t i = 0; i < 8; ++i) {
     if (data & 0x80 >> i) {
-      writeLongPulse_(output, size, waveform);
+      writeLongPulse_(output, size, wfc);
       ++ones;
     }
     else {
-      writeShortPulse_(output, size, waveform);
+      writeShortPulse_(output, size, wfc);
     }
   }
-  writeLongPulse_(output, size, waveform);
+  writeLongPulse_(output, size, wfc);
 
   return ones;
 }
 
 void writeChecksum(
-    FILE *output, uint32_t *size, uint16_t const checksum, Waveform const *const waveform) {
-  writeByte(output, size, checksum >> 8, waveform);
-  writeByte(output, size, checksum, waveform);
-  writeLongPulse_(output, size, waveform);
-}
-
-void configureWaveform(  // TODO
-    Waveform *waveform, Speed const speed, int const bitrate,
-    bool const invert, int const correction) {
-  *waveform = waveforms_[speed];
-  waveform->invert = invert;
-
-  if (speed == fastNormal) {
-    waveform->longPulse.up += correction;
-    waveform->longPulse.down += correction;
-    waveform->shortPulse.up += correction;
-    waveform->shortPulse.down += correction;
-  }
-  if (speed == fastTurbo) {
-    waveform->longPulse.down += correction;
-    waveform->shortPulse.down += correction;
-  }
-
-  int const scale = 44100 / bitrate;
-  waveform->longPulse.up /= scale;
-  waveform->longPulse.down /= scale;
-  waveform->shortPulse.up /= scale;
-  waveform->shortPulse.down /= scale;
+    FILE *output, uint32_t *size, uint16_t const checksum,
+    WaveCfgPtr wfc) {
+  writeByte(output, size, checksum >> 8, wfc);
+  writeByte(output, size, checksum, wfc);
+  writeLongPulse_(output, size, wfc);
 }
 
 uint16_t getImageSize(uint8_t const *const image) {

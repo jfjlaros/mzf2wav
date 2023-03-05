@@ -5,22 +5,22 @@
 
 /*! Write one bit.
  *
- * \param output Output file.
- * \param bit Bit.
- * \param invert Invert polarity.
+ * \param [out] output Output file.
+ * \param [in] bit Bit.
+ * \param [in] invert Invert polarity.
  */
 void writeBit(FILE *output, bool const bit, bool const invert);
 
 /*! Write the WAV header.
  *
- * \param output Output file.
+ * \param [out] output Output file.
  */
 void writeHeader(FILE *output);
 
 /*! Update the WAV header.
  *
- * \param output Output file.
- * \param size File size.
- * \param bitrate Bitrate.
+ * \param [out] output Output file.
+ * \param [in] size File size.
+ * \param [in] bitrate Bitrate.
  */
 void updateHeader(FILE *output, uint32_t const size, uint32_t const bitrate);
