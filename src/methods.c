@@ -84,79 +84,79 @@ uint8_t const program_[] = {
 
 
 uint32_t fastTransfer(
-    FILE *output, uint8_t const *const image, WaveCfgPtr wfc) {
+    FILE *output, uint8_t const *const image, PCP pulseConfig) {
   uint32_t bytesWritten = 0;
 
-  writeGap(output, &bytesWritten, 4000, wfc);
-  writeTapeMark(output, &bytesWritten, 40, wfc);
+  writeGap(output, &bytesWritten, 4000, pulseConfig);
+  writeTapeMark(output, &bytesWritten, 40, pulseConfig);
 
   // Header.
   uint16_t checkSum = 0;
   for (uint8_t i = 0; i < 128; ++i) {
-    checkSum += writeByte(output, &bytesWritten, image[i], wfc);
+    checkSum += writeByte(output, &bytesWritten, image[i], pulseConfig);
   }
-  writeChecksum(output, &bytesWritten, checkSum, wfc);
+  writeChecksum(output, &bytesWritten, checkSum, pulseConfig);
 
-  writeGap(output, &bytesWritten, 5000, wfc);
-  writeTapeMark(output, &bytesWritten, 20, wfc);
+  writeGap(output, &bytesWritten, 5000, pulseConfig);
+  writeTapeMark(output, &bytesWritten, 20, pulseConfig);
 
   // Body.
   uint16_t imageSize = getImageSize(image) + 128;
   checkSum = 0;
   for (uint16_t i = 128; i < imageSize; ++i) {
-    checkSum += writeByte(output, &bytesWritten, image[i], wfc);
+    checkSum += writeByte(output, &bytesWritten, image[i], pulseConfig);
   }
-  writeChecksum(output, &bytesWritten, checkSum, wfc);
+  writeChecksum(output, &bytesWritten, checkSum, pulseConfig);
 
   return bytesWritten;
 }
 
 uint32_t conventionalTransfer(
-    FILE *output, uint8_t const *const image, WaveCfgPtr wfc) {
+    FILE *output, uint8_t const *const image, PCP pulseConfig) {
   uint32_t bytesWritten = 0;
 
-  writeGap(output, &bytesWritten, 22000, wfc);
-  writeTapeMark(output, &bytesWritten, 40, wfc);
+  writeGap(output, &bytesWritten, 22000, pulseConfig);
+  writeTapeMark(output, &bytesWritten, 40, pulseConfig);
 
   // Header.
   uint16_t checkSum = 0;
   for (uint8_t i = 0; i < 128; ++i) {
-    checkSum += writeByte(output, &bytesWritten, image[i], wfc);
+    checkSum += writeByte(output, &bytesWritten, image[i], pulseConfig);
   }
-  writeChecksum(output, &bytesWritten, checkSum, wfc);
+  writeChecksum(output, &bytesWritten, checkSum, pulseConfig);
 
-  writeGap(output, &bytesWritten, 256, wfc);
+  writeGap(output, &bytesWritten, 256, pulseConfig);
 
   // Copy of the header.
   for (uint8_t i = 0; i < 128; ++i) {
-    writeByte(output, &bytesWritten, image[i], wfc);
+    writeByte(output, &bytesWritten, image[i], pulseConfig);
   }
-  writeChecksum(output, &bytesWritten, checkSum, wfc);
+  writeChecksum(output, &bytesWritten, checkSum, pulseConfig);
 
-  writeGap(output, &bytesWritten, 11000, wfc);
-  writeTapeMark(output, &bytesWritten, 20, wfc);
+  writeGap(output, &bytesWritten, 11000, pulseConfig);
+  writeTapeMark(output, &bytesWritten, 20, pulseConfig);
 
   // Body.
   uint16_t imageSize = getImageSize(image) + 128;
   checkSum = 0;
   for (uint16_t i = 128; i < imageSize; ++i) {
-    checkSum += writeByte(output, &bytesWritten, image[i], wfc);
+    checkSum += writeByte(output, &bytesWritten, image[i], pulseConfig);
   }
-  writeChecksum(output, &bytesWritten, checkSum, wfc);
+  writeChecksum(output, &bytesWritten, checkSum, pulseConfig);
 
-  writeGap(output, &bytesWritten, 256, wfc);
+  writeGap(output, &bytesWritten, 256, pulseConfig);
 
   // Copy of the body.
   for (uint16_t i = 128; i < imageSize; ++i) {
-    writeByte(output, &bytesWritten, image[i], wfc);
+    writeByte(output, &bytesWritten, image[i], pulseConfig);
   }
-  writeChecksum(output, &bytesWritten, checkSum, wfc);
+  writeChecksum(output, &bytesWritten, checkSum, pulseConfig);
 
   return bytesWritten;
 }
 
 uint32_t turboTransfer(
-    FILE *output, uint8_t const *const image, WaveCfgPtr wfc) {
+    FILE *output, uint8_t const *const image, PCP pulseConfig) {
   //Speed secondStageSpeed = turbo2;  // TODO: remove
 
   uint8_t program[sizeof(program_)];
@@ -169,7 +169,7 @@ uint32_t turboTransfer(
   // Info.
   memcpy(program + 205, image + 18, 13);
 
-  uint32_t bytesWritten = fastTransfer(output, program, wfc);
+  uint32_t bytesWritten = fastTransfer(output, program, pulseConfig);
   //Waveform waveform_ = makeWaveform(  // TODO
   //  secondStageSpeed, 42000, waveform->invert, 0);
   //bytesWritten += fastTransfer(output, image, &waveform_);

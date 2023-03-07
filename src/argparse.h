@@ -1,18 +1,13 @@
 #include "methods.h"
 
 typedef struct {  // TODO: check types.
-  Speed speed;
-  int correction;
-} WaveConfig;
-
-typedef struct {  // TODO: check types.
   char const *input;
   char const *output;
-  WaveConfig initial;
-  WaveConfig turbo;
+  Pulse normal[2];
+  Pulse turbo[2];
   int bitrate;
   bool invert;
-  uint32_t (*method)(FILE *, uint8_t const *const, WaveCfgPtr);
+  uint32_t (*method)(FILE *, uint8_t const *const, PCP);
 
   bool error;
 } Options;

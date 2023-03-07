@@ -41,9 +41,13 @@ bool mzf2wav(Options const *const options) {
   writeHeader(output);
   //Waveform waveform = makeWaveform(
   //  options->initial.speed, 44000, options->invert, 0);
-  WaveFormConfig wfc = {
-    waveforms[options->initial.speed], options->invert, 44000};
-  uint32_t size_ = options->method(output, image, &wfc);
+  PulseConfig pulseConfig = {
+    toPulse(options->normal[0], options->bitrate),
+    toPulse(options->normal[1], options->bitrate),
+    options->invert};
+  //WaveFormConfig wfc = {
+  //  options->normal, options->invert, 44000};
+  uint32_t size_ = options->method(output, image, &pulseConfig);
   updateHeader(output, size_, 44356);
 
   fclose(output);

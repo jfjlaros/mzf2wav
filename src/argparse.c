@@ -3,19 +3,38 @@
 
 #include "argparse.h"
 
+// TODO: precalculate using bitrate.
+Pulse const normalDefaults_[][2] = {
+  //{{464, 494}, {240, 264}},   // Normal mode.
+  {{480, 494}, {260, 264}},   // TODO: should be the one above.
+  {{248, 474}, {248, 271}}};  // Fastest in normal mode.
+Pulse const turboDefaults_[][2] = {
+  {{248, 248}, {113, 136}},   // Turbo 2x.
+  {{158, 158}, { 68,  91}},   // Turbo 3x.
+  {{ 68, 158}, { 68,  91}}};  // Fastest in turbo mode.
+
 Options const default_ = {
-  NULL, NULL, {0, 0}, {0, 0}, 0, false, fastTransfer, NULL};
+  NULL, NULL, {normalDefaults_[0][0], normalDefaults_[0][1]},
+  {turboDefaults_[0][0], turboDefaults_[0][1]},
+  44356, false, fastTransfer, NULL};
 
 char const usage[] =
   "Usage: %s <-i n> <-t n> <-1 n> <-2 n> <-b n> <-c> <-s> <-w> <-p> in out\n"
-  " -i initial speed mode (0, 1, 2, 3 or 4), default = 0.\n"
-  " -t turbo speed mode (0, 1, 2, 3 or 4), default = 2.\n"
-  " -1 correction for fast initial mode (-50 to 50).\n"
-  " -2 correction for fast turbo mode (-50 to 50).\n"
+  " -i normal speed mode (0 or 1), default = 0.\n"
+  " -t turbo speed mode (0, 1 or 2), default = 0.\n"
+  " -1 correction for fast normal mode (-50 to 50).\n"  // TODO: replace
+  " -2 correction for fast turbo mode (-50 to 50).\n"   // TODO: replace
   " -b bitrate.\n"
   " -p reverse polarity.\n"
   " -c conventional writing mode.\n"
   " -w turbo writing mode.\n";
+
+
+/*
+void parseWaveform_(Waveform *waveform, char const *const str) {
+  char *p = str;
+}
+*/
 
 
 Options argParse(int argc, char **argv) {
@@ -25,16 +44,17 @@ Options argParse(int argc, char **argv) {
   while ((opt = getopt(argc, argv, "i:t:1:2:b:pcw")) != -1) {
     switch (opt) {
       case 'i':
-        options.initial.speed = atoi(optarg);
+        options.normal[0] = normalDefaults_[atoi(optarg)][0];
+        options.normal[1] = normalDefaults_[atoi(optarg)][1];
         break;
       case 't':
-        options.turbo.speed = atoi(optarg);
+        //options.turbo = turboDefaults_[atoi(optarg)];
         break;
       case '1':
-        options.initial.correction = atoi(optarg);
+        //options.normal = normalDefaults[atoi(optarg)];
         break;
       case '2':
-        options.turbo.correction = atoi(optarg);
+        //options.turbo = turboDefaults[atoi(optarg)];
         break;
       case 'b':
         options.bitrate = atoi(optarg);

@@ -8,63 +8,54 @@ typedef struct {
 typedef struct {
   Pulse longPulse;
   Pulse shortPulse;
-} Waveform;
-
-typedef struct {
-  Waveform wave;
   bool invert;
-  uint32_t bitrate;
-} WaveFormConfig;
+} PulseConfig;
 
-typedef WaveFormConfig const* const WaveCfgPtr;
+typedef PulseConfig const *const PCP;
 
-typedef enum {
-  normal, fastNormal, turbo2, turbo3, fastTurbo
-} Speed;
 
-extern Waveform const waveforms[];
-
+Pulse toPulse(Pulse const pulse, uint32_t const bitrate);
 
 /*! Write a gap of `n` short pulses.
  *
  * \param [out] output Output file.
  * \param [out] size Size of `output`.
  * \param [in] n Number of pulses.
- * \param [in] wfc Waveform config.
+ * \param [in] pulseConfig Pulse config.
  */
-void writeGap(FILE *output, uint32_t *size, int const n, WaveCfgPtr wfc);
+void writeGap(FILE *output, uint32_t *size, int const n, PCP pulseConfig);
 
 /*! Write a tape mark of `n` long pulses, `n` short pulses and one long pulse.
  *
  * \param [out] output Output file.
  * \param [out] size Size of `output`.
  * \param [in] n Number of pulses.
- * \param [in] wfc Waveform config.
+ * \param [in] pulseConfig Pulse config.
  */
 void writeTapeMark(
-  FILE *output, uint32_t *size, int const n, WaveCfgPtr wfc);
+  FILE *output, uint32_t *size, int const n, PCP pulseConfig);
 
 /*! Write a byte and count the number of ones for the checksum.
  *
  * \param [out] output Output file.
  * \param [out] size Size of `output`.
  * \param [in] data Data.
- * \param [in] wfc Waveform config.
+ * \param [in] pulseConfig Pulse config.
  *
  * \return Number of ones in `data`.
  */
 uint16_t writeByte(
-  FILE *output, uint32_t *size, uint8_t const data, WaveCfgPtr wfc);
+  FILE *output, uint32_t *size, uint8_t const data, PCP pulseConfig);
 
 /*! Write a checksum.
  *
  * \param [out] output Output file.
  * \param [out] size Size of `output`.
  * \param [in] checksum Checksum.
- * \param [in] wfc Waveform config.
+ * \param [in] pulseConfig Pulse config.
  */
 void writeChecksum(
-  FILE *output, uint32_t *size, uint16_t const checksum, WaveCfgPtr wfc);
+  FILE *output, uint32_t *size, uint16_t const checksum, PCP pulseConfig);
 
 /*! Get the image size.
  *
