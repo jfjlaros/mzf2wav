@@ -83,82 +83,81 @@ uint8_t const program_[] = {
 };
 
 
-uint32_t fastTransfer(
-    FILE *output, uint8_t const *const image, PCP pulseConfig) {
-  uint32_t bytesWritten = 0;
-
-  writeGap(output, &bytesWritten, 4000, pulseConfig);
-  writeTapeMark(output, &bytesWritten, 40, pulseConfig);
-
-  // Header.
-  uint16_t checkSum = 0;
-  for (uint8_t i = 0; i < 128; ++i) {
-    checkSum += writeByte(output, &bytesWritten, image[i], pulseConfig);
-  }
-  writeChecksum(output, &bytesWritten, checkSum, pulseConfig);
-
-  writeGap(output, &bytesWritten, 5000, pulseConfig);
-  writeTapeMark(output, &bytesWritten, 20, pulseConfig);
-
-  // Body.
-  uint16_t imageSize = getImageSize(image) + 128;
-  checkSum = 0;
-  for (uint16_t i = 128; i < imageSize; ++i) {
-    checkSum += writeByte(output, &bytesWritten, image[i], pulseConfig);
-  }
-  writeChecksum(output, &bytesWritten, checkSum, pulseConfig);
-
-  return bytesWritten;
+uint16_t getImageSize_(IMGP image) {
+  return image[0x12] | image[0x13] << 8;
 }
 
-uint32_t conventionalTransfer(
-    FILE *output, uint8_t const *const image, PCP pulseConfig) {
-  uint32_t bytesWritten = 0;
-
-  writeGap(output, &bytesWritten, 22000, pulseConfig);
-  writeTapeMark(output, &bytesWritten, 40, pulseConfig);
-
-  // Header.
+void writeHeader_(
+    FILE *output, uint32_t *size, IMGP image, PCP pulseConfig) {
   uint16_t checkSum = 0;
   for (uint8_t i = 0; i < 128; ++i) {
-    checkSum += writeByte(output, &bytesWritten, image[i], pulseConfig);
+    checkSum += writeByte(output, size, image[i], pulseConfig);
   }
-  writeChecksum(output, &bytesWritten, checkSum, pulseConfig);
+  writeChecksum(output, size, checkSum, pulseConfig);
+}
 
-  writeGap(output, &bytesWritten, 256, pulseConfig);
-
-  // Copy of the header.
-  for (uint8_t i = 0; i < 128; ++i) {
-    writeByte(output, &bytesWritten, image[i], pulseConfig);
+void writeBody_(
+    FILE *output, uint32_t *size, IMGP image, PCP pulseConfig) {
+  uint16_t checkSum = 0;
+  uint16_t const end = getImageSize_(image) + 128;
+  for (uint16_t i = 128; i < end; ++i) {
+    checkSum += writeByte(output, size, image[i], pulseConfig);
   }
-  writeChecksum(output, &bytesWritten, checkSum, pulseConfig);
+  writeChecksum(output, size, checkSum, pulseConfig);
+}
 
-  writeGap(output, &bytesWritten, 11000, pulseConfig);
-  writeTapeMark(output, &bytesWritten, 20, pulseConfig);
+void writeLeader_(
+    FILE *output, uint32_t *size, PCP pulseConfig,
+    uint16_t const gapLength, uint16_t const tapeMarkLength) {
+  writeGap(output, size, gapLength, pulseConfig);
+  writeTapeMark(output, size, tapeMarkLength, pulseConfig);
+}
 
-  // Body.
-  uint16_t imageSize = getImageSize(image) + 128;
-  checkSum = 0;
-  for (uint16_t i = 128; i < imageSize; ++i) {
-    checkSum += writeByte(output, &bytesWritten, image[i], pulseConfig);
+
+int checkImage(IMGP image, uint16_t const size) {
+  // TODO
+  uint16_t const imageSize = getImageSize_(image);
+
+  if (imageSize + 0x80 != size) {
+    if (size - imageSize > 0x200)
+      return 2;
+    if (size < imageSize)
+      return 2;
+    return 1;
   }
-  writeChecksum(output, &bytesWritten, checkSum, pulseConfig);
+  return 0;
+}
 
-  writeGap(output, &bytesWritten, 256, pulseConfig);
+uint32_t fastTransfer(FILE *output, IMGP image, PCP pulseConfig) {
+  uint32_t size = 0;
 
-  // Copy of the body.
-  for (uint16_t i = 128; i < imageSize; ++i) {
-    writeByte(output, &bytesWritten, image[i], pulseConfig);
-  }
-  writeChecksum(output, &bytesWritten, checkSum, pulseConfig);
+  writeLeader_(output, &size, pulseConfig, 4000, 40);
+  writeHeader_(output, &size, image, pulseConfig);
 
-  return bytesWritten;
+  writeLeader_(output, &size, pulseConfig, 5000, 20);
+  writeBody_(output, &size, image, pulseConfig);
+
+  return size;
+}
+
+uint32_t conventionalTransfer(FILE *output, IMGP image, PCP pulseConfig) {
+  uint32_t size = 0;
+
+  writeLeader_(output, &size, pulseConfig, 22000, 40);
+  writeHeader_(output, &size, image, pulseConfig);
+  writeGap(output, &size, 256, pulseConfig);
+  writeHeader_(output, &size, image, pulseConfig);
+
+  writeLeader_(output, &size, pulseConfig, 11000, 20);
+  writeBody_(output, &size, image, pulseConfig);
+  writeGap(output, &size, 256, pulseConfig);
+  writeBody_(output, &size, image, pulseConfig);
+
+  return size;
 }
 
 uint32_t turboTransfer(
-    FILE *output, uint8_t const *const image, PCP pulseConfig) {
-  //Speed secondStageSpeed = turbo2;  // TODO: remove
-
+    FILE *output, IMGP image, PCP pulseConfig) {
   uint8_t program[sizeof(program_)];
   memcpy(program, program_, sizeof(program_));
 
@@ -169,10 +168,10 @@ uint32_t turboTransfer(
   // Info.
   memcpy(program + 205, image + 18, 13);
 
-  uint32_t bytesWritten = fastTransfer(output, program, pulseConfig);
+  uint32_t size = fastTransfer(output, program, pulseConfig);
   //Waveform waveform_ = makeWaveform(  // TODO
   //  secondStageSpeed, 42000, waveform->invert, 0);
-  //bytesWritten += fastTransfer(output, image, &waveform_);
+  //size += fastTransfer(output, image, &waveform_);
 
-  return bytesWritten;
+  return size;
 }

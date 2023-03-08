@@ -14,8 +14,6 @@ typedef struct {
 typedef PulseConfig const *const PCP;
 
 
-Pulse toPulse(Pulse const pulse, uint32_t const bitrate);
-
 /*! Write a gap of `n` short pulses.
  *
  * \param [out] output Output file.
@@ -56,20 +54,3 @@ uint16_t writeByte(
  */
 void writeChecksum(
   FILE *output, uint32_t *size, uint16_t const checksum, PCP pulseConfig);
-
-/*! Get the image size.
- *
- * \param [in] image MZF image.
- *
- * \return Size of `image`.
- */
-uint16_t getImageSize(uint8_t const *const image);
-
-/*! See if the MZF file is valid.
- *
- * \param [in] image MZF image.
- * \param [in] size Image size.
- *
- * \return TODO
- */
-int checkImage(uint8_t const *const image, uint16_t const size);

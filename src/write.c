@@ -1,4 +1,4 @@
-#include "physical.h"
+#include "write.h"
 
 
 void writeLongPulse_(FILE *output, uint32_t *size, PCP pulseConfig) {
@@ -21,12 +21,6 @@ void writeShortPulse_(FILE *output, uint32_t *size, PCP pulseConfig) {
   *size += pulseConfig->shortPulse.up + pulseConfig->shortPulse.down;
 }
 
-
-Pulse toPulse(Pulse const pulse, uint32_t const bitrate) {  // TODO: move?
-  Pulse pulse_ = {
-    pulse.up * bitrate / 1000000, pulse.down * bitrate / 1000000};
-  return pulse_;
-}
 
 void writeGap(FILE *output, uint32_t *size, int const n, PCP pulseConfig) {
   for (int i = 0; i < n; ++i) {
@@ -70,21 +64,4 @@ void writeChecksum(
   writeByte(output, size, checksum >> 8, pulseConfig);
   writeByte(output, size, checksum, pulseConfig);
   writeLongPulse_(output, size, pulseConfig);
-}
-
-uint16_t getImageSize(uint8_t const *const image) {
-  return image[0x12] | image[0x13] << 8;
-}
-
-int checkImage(uint8_t const *const image, uint16_t const size) {  // TODO
-  uint16_t imageSize = getImageSize(image);
-
-  if (imageSize + 0x80 != size) {
-    if (size - imageSize > 0x200)
-      return 2;
-    if (size < imageSize)
-      return 2;
-    return 1;
-  }
-  return 0;
 }

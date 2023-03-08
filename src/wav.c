@@ -24,8 +24,8 @@ void writeInt_(FILE *output, uint32_t const data) {
 
 
 void writeBit(FILE *output, bool const bit, bool const invert) {
-  uint8_t const zero = 0x30;  // 0x00?
-  uint8_t const one = 0xd0;   // 0xff?
+  uint8_t const zero = 0x30;  // TODO: 0x00?
+  uint8_t const one = 0xd0;   // TODO: 0xff?
 
   if (bit != invert) {
     fprintf(output, "%c", one);
@@ -54,4 +54,6 @@ void updateHeader(
   // Data size.
   fseek(output, 40, SEEK_SET);
   writeInt_(output, size);
+
+  // TODO: SEEK_END?
 }

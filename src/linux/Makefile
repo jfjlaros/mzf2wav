@@ -3,7 +3,7 @@ CFLAGS = -Wall -Wextra -pedantic -O2 -static
 
 EXEC = mzf2wav
 MAIN = ../mzf2wav.c
-OBJS = ../argparse.o ../methods.o ../physical.o ../wav.o
+OBJS = ../argparse.o ../methods.o ../wav.o ../write.o
 
 all: $(EXEC)
 

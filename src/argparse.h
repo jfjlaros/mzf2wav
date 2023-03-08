@@ -1,13 +1,21 @@
 #include "methods.h"
 
+typedef enum {conventional, fast, turbo} Method;
+
+typedef struct {
+  Pulse longPulse;
+  Pulse shortPulse;
+} PulsePair;
+
 typedef struct {  // TODO: check types.
   char const *input;
   char const *output;
-  Pulse normal[2];
-  Pulse turbo[2];
+  PulsePair normal;
+  PulsePair turbo;
   int bitrate;
   bool invert;
-  uint32_t (*method)(FILE *, uint8_t const *const, PCP);
+  //uint32_t (*method)(FILE *, uint8_t const *const, PCP);
+  Method method;
 
   bool error;
 } Options;
