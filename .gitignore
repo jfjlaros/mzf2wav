@@ -1,3 +1,5 @@
 .gitignore
-src/*.o
-src/*.obj
+build/linux/*.o
+build/linux/mzf2wav
+build/windows/*.o
+build/windows/mzf2wav.exe

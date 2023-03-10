@@ -41,6 +41,13 @@ bool mzf2wav(Options const *const options) {
 
   stripTag_(image, &size);
 
+  /*
+  if (size != imageSize(image) + 128) {
+    printf("MZF file size does not match header data.")
+    return false;
+  }
+  */
+
   // Transfer file.
   FILE *output = fopen(options->output, "wb");
   if (!output) {
@@ -78,6 +85,10 @@ bool mzf2wav(Options const *const options) {
 
 int main(int argc, char **argv) {
   Options options = argParse(argc, argv);
+  if (options.version) {
+    printf(version);
+    return 0;
+  }
   if (options.error || !mzf2wav(&options)) {
     printf(usage, argv[0]);
     return 1;

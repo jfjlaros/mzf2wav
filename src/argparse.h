@@ -5,22 +5,24 @@ typedef enum {conventional, fast, turbo} Method;
 typedef struct {
   Pulse longPulse;
   Pulse shortPulse;
-} PulsePair;
+} Pulses;
 
-typedef struct {  // TODO: check types.
+typedef struct {
   char const *input;
   char const *output;
-  PulsePair normal;
-  PulsePair turbo;
-  int bitrate;
-  bool invert;
-  //uint32_t (*method)(FILE *, uint8_t const *const, PCP);
+
   Method method;
+  bool invert;
+  int bitrate;
+  Pulses normal;
+  Pulses turbo;
 
   bool error;
+  bool version;
 } Options;
 
 extern char const usage[];
+extern char const version[];
 
 
 /*! Parse command line arguments.

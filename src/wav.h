@@ -2,7 +2,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-
 /*! Write one bit.
  *
  * \param [out] output Output file.

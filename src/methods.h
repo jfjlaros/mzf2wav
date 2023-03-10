@@ -1,15 +1,6 @@
+#include "mzf.h"
 #include "write.h"
 
-typedef uint8_t const *const IMGP;
-
-/*! See if the MZF file is valid.
- *
- * \param [in] image MZF image.
- * \param [in] size Image size.
- *
- * \return TODO
- */
-int checkImage(IMGP image, uint16_t const size);
 
 /*! Fast file transfer.
  *
