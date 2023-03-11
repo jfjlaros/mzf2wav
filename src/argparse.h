@@ -3,33 +3,28 @@
 typedef enum {conventional, fast, turbo} Method;
 
 typedef struct {
-  Pulse longPulse;
-  Pulse shortPulse;
-} Pulses;
+  char const *input;   //!< Input file.
+  char const *output;  //!< Output file.
 
-typedef struct {
-  char const *input;
-  char const *output;
+  Method method;       //!< Transfer method.
+  bool invert;         //!< Invert polarity.
+  uint32_t bitrate;    //!< Bit rate.
+  uint16_t normal[4];  //!< Normal mode pulses.
+  uint16_t turbo[4];   //!< Turbo mode pulses.
 
-  Method method;
-  bool invert;
-  int bitrate;
-  Pulses normal;
-  Pulses turbo;
-
-  bool error;
-  bool version;
+  bool error;          //!< Error.
+  bool version;        //!< Version.
 } Options;
 
-extern char const usage[];
-extern char const version[];
+extern char const usage[];    // Usage string.
+extern char const version[];  // Version string.
 
 
 /*! Parse command line arguments.
  *
- * \param argc
- * \param argv
+ * \param [in] argc Argument count.
+ * \param [in] argv Argument vector.
  *
- * \return
+ * \return Parsed options.
  */
-Options argParse(int argc, char **argv);
+Options argParse(int const argc, char *const *const argv);

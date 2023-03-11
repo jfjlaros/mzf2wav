@@ -1,6 +1,8 @@
+#include <string.h>
+
 #include "mzf.h"
 
-uint8_t const turboLoader[] = {
+uint8_t const turboLoader_[] = {
   0x01,                                                  // Program type.
 
   0x0d, 0x0d, 0x0d, 0x0d, 0x0d,                          // Room for the
@@ -48,7 +50,7 @@ uint8_t const turboLoader[] = {
   0x3a, 0x4b, 0xd4, // D414: LD A, (d44bh)
   0x32, 0x4b, 0x0a, // D417: LD (0a4bh), A ; (0x0a4b) = (0xd44b)
   0x3a, 0x4c, 0xd4, // D41A: LD A, (d44ch)
-  0x32, 0x12, 0x05, // D41D: LD (0512h), A ; (0xd44c) = (0x0512)
+  0x32, 0x12, 0x05, // D41D: LD (0512h), A ; (0x0512) = (0xd44c)
   0x21, 0x4d, 0xd4, // D420: LD HL, d44dh
   0x11, 0x02, 0x11, // D423: LD DE, 1102h
   0x01, 0x0d, 0x00, // D426: LD BC, 000dh
@@ -79,23 +81,37 @@ uint8_t const turboLoader[] = {
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 // + the first 7 bytes of comment.
 };
 
-size_t const turboLoaderSize = sizeof(turboLoader);
+size_t const turboLoaderSize = sizeof(turboLoader_);
 
 
-uint16_t getImageSize(IMGP image) {
+void sanitiseImage(uint8_t *const image, uint32_t *const size) {
+  if (!memcmp(image, "MZF1", 4)) {
+    *size -= 4;
+    memmove(image, image + 4, *size);
+  }
+}
+
+uint16_t imageSize(IMGP image) {
   return image[0x12] | image[0x13] << 8;
 }
 
-int checkImage(IMGP image, uint16_t const size) {
-  // TODO
-  uint16_t const imageSize = getImageSize(image);
-
-  if (imageSize + 0x80 != size) {
-    if (size - imageSize > 0x200)
-      return 2;
-    if (size < imageSize)
-      return 2;
-    return 1;
+bool checkImage(IMGP image, uint16_t const size) {
+  if (!image[0] || image[0] > 5) {
+    return false;
   }
-  return 0;
+  if (size != imageSize(image) + 128) {
+    return false;
+  }
+  return true;
+}
+
+void prepareLoader(uint8_t *const loader, IMGP image) {
+  memcpy(loader, turboLoader_, turboLoaderSize);
+
+  // Name.
+  memcpy(loader + 1, image + 1, 17);
+  // Comment.
+  memcpy(loader + 31, image + 31, 97);
+  // Info.
+  memcpy(loader + 205, image + 18, 13);
 }

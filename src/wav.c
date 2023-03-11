@@ -16,14 +16,14 @@ uint8_t const header_[] = {
   0x00, 0x00, 0x00, 0x00};  // Size of data chunk.
 
 
-void writeInt_(FILE *output, uint32_t const data) {
+void writeInt_(FILE *const output, uint32_t const data) {
   for (size_t i = 0; i < sizeof(data); ++i) {
     fprintf(output, "%c", data >> 8 * i);
   }
 }
 
 
-void writeBit(FILE *output, bool const bit, bool const invert) {
+void writeBit(FILE *const output, bool const bit, bool const invert) {
   uint8_t const zero = 0x30;  // TODO: 0x00?
   uint8_t const one = 0xd0;   // TODO: 0xff?
 
@@ -34,14 +34,14 @@ void writeBit(FILE *output, bool const bit, bool const invert) {
   fprintf(output, "%c", zero);
 }
 
-void writeHeader(FILE *output) {
+void writeHeader(FILE *const output) {
   for (uint8_t i = 0; i < sizeof(header_); ++i) {
     fprintf(output, "%c", header_[i]);
   }
 }
 
 void updateHeader(
-    FILE *output, uint32_t const size, uint32_t const bitrate) {
+    FILE *const output, uint32_t const size, uint32_t const bitrate) {
   // File size.
   fseek(output, 4, SEEK_SET);
   writeInt_(output, size + 36);
@@ -55,5 +55,5 @@ void updateHeader(
   fseek(output, 40, SEEK_SET);
   writeInt_(output, size);
 
-  // TODO: SEEK_END?
+  fseek(output, 0, SEEK_END);
 }

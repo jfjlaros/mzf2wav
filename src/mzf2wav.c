@@ -3,6 +3,7 @@
 
 #include "argparse.h"
 
+
 unsigned int fileSize_(FILE *handle) {
   fseek(handle, 0, SEEK_END);
   unsigned int size = ftell(handle);
@@ -10,45 +11,39 @@ unsigned int fileSize_(FILE *handle) {
   return size;
 }
 
-void stripTag_(uint8_t *image, unsigned int *size) {
-  if (!memcmp(image, "MZF1", 4)) {
-    *size -= 4;
-    memmove(image, image + 4, *size);
-  }
-}
-
 uint16_t scale_(uint16_t const length, uint32_t const bitrate) {
   return length * bitrate / 1000000;
 }
 
-Pulse scalePulse_(Pulse const pulse, uint32_t const bitrate) {
-  Pulse scaled = {scale_(pulse.up, bitrate), scale_(pulse.down, bitrate)};
-  return scaled;
+PulseConfig makePulseConfig_(
+    uint16_t const *const cfg, uint32_t const bitrate, bool const invert) {
+  PulseConfig pulseConfig = {
+    {scale_(cfg[0], bitrate), scale_(cfg[1], bitrate)},
+    {scale_(cfg[2], bitrate), scale_(cfg[3], bitrate)}, invert};
+  return pulseConfig;
 }
 
 
 bool mzf2wav(Options const *const options) {
-  // Load image.
+  // Load MZF image.
   FILE *input = fopen(options->input, "rb");
   if (!input) {
     printf("Unable to open file \"%s\" for reading.\n", options->input);
     return false;
   }
-  unsigned int size = fileSize_(input);
+  uint32_t size = fileSize_(input);
   uint8_t image[size];
   fread(image, 1, size, input);
   fclose(input);
 
-  stripTag_(image, &size);
-
-  /*
-  if (size != imageSize(image) + 128) {
-    printf("MZF file size does not match header data.")
+  // Sanitise and check image.
+  sanitiseImage(image, &size);
+  if (!checkImage(image, size)) {
+    printf("Invalid MZF file.\n");
     return false;
   }
-  */
 
-  // Transfer file.
+  // Write WAV file.
   FILE *output = fopen(options->output, "wb");
   if (!output) {
     printf("Unable to open file \"%s\" for writing.\n", options->output);
@@ -57,10 +52,10 @@ bool mzf2wav(Options const *const options) {
 
   writeHeader(output);
 
-  PulseConfig pulseConfig = {
-    scalePulse_(options->normal.longPulse, options->bitrate),
-    scalePulse_(options->normal.shortPulse, options->bitrate),
-    options->invert};
+  PulseConfig pulseConfig = makePulseConfig_(
+    options->normal, options->bitrate, options->invert);
+  PulseConfig turboConfig = makePulseConfig_(
+    options->turbo, options->bitrate, options->invert);
 
   uint32_t size_ = 0;
   switch (options->method) {
@@ -71,11 +66,10 @@ bool mzf2wav(Options const *const options) {
       size_ = fastTransfer(output, image, &pulseConfig);
       break;
     case turbo:
-      size_ = fastTransfer(output, image, &pulseConfig);
-      // TODO.
+      size_ = turboTransfer(output, image, &pulseConfig, &turboConfig);
       break;
   }
-  updateHeader(output, size_, 44356);
+  updateHeader(output, size_, options->bitrate);
 
   fclose(output);
 
@@ -83,7 +77,7 @@ bool mzf2wav(Options const *const options) {
 }
 
 
-int main(int argc, char **argv) {
+int main(int const argc, char *const *const argv) {
   Options options = argParse(argc, argv);
   if (options.version) {
     printf(version);

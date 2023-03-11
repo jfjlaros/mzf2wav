@@ -2,19 +2,20 @@
 #include <stdint.h>
 #include <stdio.h>
 
+
 /*! Write one bit.
  *
  * \param [out] output Output file.
  * \param [in] bit Bit.
  * \param [in] invert Invert polarity.
  */
-void writeBit(FILE *output, bool const bit, bool const invert);
+void writeBit(FILE *const output, bool const bit, bool const invert);
 
 /*! Write the WAV header.
  *
  * \param [out] output Output file.
  */
-void writeHeader(FILE *output);
+void writeHeader(FILE *const output);
 
 /*! Update the WAV header.
  *
@@ -22,4 +23,5 @@ void writeHeader(FILE *output);
  * \param [in] size File size.
  * \param [in] bitrate Bitrate.
  */
-void updateHeader(FILE *output, uint32_t const size, uint32_t const bitrate);
+void updateHeader(
+  FILE *const output, uint32_t const size, uint32_t const bitrate);

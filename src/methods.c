@@ -1,17 +1,15 @@
-#include <string.h>
-
 #include "methods.h"
 
 
 void writeLeader_(
-    FILE *output, uint32_t *size, PCP pulseConfig,
+    FILE *const output, uint32_t *const size, PCP pulseConfig,
     uint16_t const gapLength, uint16_t const tapeMarkLength) {
   writeGap(output, size, gapLength, pulseConfig);
   writeTapeMark(output, size, tapeMarkLength, pulseConfig);
 }
 
 void writeHeader_(
-    FILE *output, uint32_t *size, IMGP image, PCP pulseConfig) {
+    FILE *const output, uint32_t *const size, IMGP image, PCP pulseConfig) {
   uint16_t checkSum = 0;
   for (uint8_t i = 0; i < 128; ++i) {
     checkSum += writeByte(output, size, image[i], pulseConfig);
@@ -20,9 +18,9 @@ void writeHeader_(
 }
 
 void writeBody_(
-    FILE *output, uint32_t *size, IMGP image, PCP pulseConfig) {
+    FILE *const output, uint32_t *const size, IMGP image, PCP pulseConfig) {
   uint16_t checkSum = 0;
-  uint16_t const end = getImageSize(image) + 128;
+  uint16_t const end = imageSize(image) + 128;
   for (uint16_t i = 128; i < end; ++i) {
     checkSum += writeByte(output, size, image[i], pulseConfig);
   }
@@ -30,7 +28,7 @@ void writeBody_(
 }
 
 
-uint32_t fastTransfer(FILE *output, IMGP image, PCP pulseConfig) {
+uint32_t fastTransfer(FILE *const output, IMGP image, PCP pulseConfig) {
   uint32_t size = 0;
 
   writeLeader_(output, &size, pulseConfig, 4000, 40);
@@ -42,7 +40,8 @@ uint32_t fastTransfer(FILE *output, IMGP image, PCP pulseConfig) {
   return size;
 }
 
-uint32_t conventionalTransfer(FILE *output, IMGP image, PCP pulseConfig) {
+uint32_t conventionalTransfer(
+    FILE *const output, IMGP image, PCP pulseConfig) {
   uint32_t size = 0;
 
   writeLeader_(output, &size, pulseConfig, 22000, 40);
@@ -59,21 +58,12 @@ uint32_t conventionalTransfer(FILE *output, IMGP image, PCP pulseConfig) {
 }
 
 uint32_t turboTransfer(
-    FILE *output, IMGP image, PCP pulseConfig) {
-  uint8_t program_[turboLoaderSize];
-  memcpy(program_, turboLoader, turboLoaderSize);
+    FILE *const output, IMGP image, PCP pulseConfig, PCP turboConfig) {
+  uint8_t turboLoader[turboLoaderSize];
+  prepareLoader(turboLoader, image);
 
-  // Name.
-  memcpy(program_ + 1, image + 1, 17);
-  // Comment.
-  memcpy(program_ + 31, image + 31, 97);
-  // Info.
-  memcpy(program_ + 205, image + 18, 13);
-
-  uint32_t size = fastTransfer(output, program_, pulseConfig);
-  //Waveform waveform_ = makeWaveform(  // TODO
-  //  secondStageSpeed, 42000, waveform->invert, 0);
-  //size += fastTransfer(output, image, &waveform_);
+  uint32_t size = fastTransfer(output, turboLoader, pulseConfig);
+  size += fastTransfer(output, image, turboConfig);
 
   return size;
 }
