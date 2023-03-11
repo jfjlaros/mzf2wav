@@ -13,11 +13,11 @@ uint16_t const turboDefaults_[][4] = {
   { 68, 158,  68,  91}};  // Fastest in turbo mode.
 
 Options const default_ = {
-  NULL, NULL, fast, false, 44100, {0}, {0}, false, false};
+  NULL, NULL, fast, false, 44100, {0}, {0}, false, false, false};
 
 char const usage[] =
-  "usage: %s [-c] [-t] [-p] [-b BITRATE] [-n SPEED] [-s SPEED]\n"
-  "  [-N FMT] [-S FMT] MZF WAV\n\n"
+  "usage: %s [-c] [-t] [-p] [-b BITRATE] [-n SPEED] [-s SPEED] "
+  "[-N FMT] [-S FMT] MZF WAV\n\n"
   "positional arguments:\n"
   "  MZF          input file in MZF format\n"
   "  WAV          input file in WAV format\n\n"
@@ -40,6 +40,14 @@ char const version[] =
   "Homepage: https://mzf2wav.readthedocs.io\n";
 
 
+size_t parseInt_(char const *const text, size_t const range) {
+  size_t idx = strtoul(text, NULL, 10);
+  if (idx >= range) {
+    return 0;
+  }
+  return idx;
+}
+
 void customPulses_(uint16_t *const pulses, char *const text) {
   char *p = text;
   for (size_t i = 0; i < 4 && *p; ++i, ++p) {
@@ -55,14 +63,14 @@ Options argParse(int const argc, char *const *const argv) {
   memcpy(options.turbo, turboDefaults_[0], size);
 
   int opt;
-  while ((opt = getopt(argc, argv, "hvctp:b:n:s:N:S:")) != -1) {
+  while ((opt = getopt(argc, argv, "hvctpb:n:s:N:S:")) != -1) {
     switch (opt) {
       case 'h':
-        options.error = true;
-        break;
+        options.help = true;
+        return options;
       case 'v':
         options.version = true;
-        break;
+        return options;
       case 'c':
         options.method = conventional;
         break;
@@ -76,12 +84,10 @@ Options argParse(int const argc, char *const *const argv) {
         options.bitrate = atoi(optarg);
         break;
       case 'n':
-        // TODO: Range check.
-        memcpy(options.normal, normalDefaults_[atoi(optarg)], size);
+        memcpy(options.normal, normalDefaults_[parseInt_(optarg, 2)], size);
         break;
       case 's':
-        // TODO: Range check.
-        memcpy(options.turbo, turboDefaults_[atoi(optarg)], size);
+        memcpy(options.turbo, turboDefaults_[parseInt_(optarg, 3)], size);
         break;
       case 'N':
         customPulses_(options.normal, optarg);
@@ -91,6 +97,7 @@ Options argParse(int const argc, char *const *const argv) {
         break;
       default:
         options.error = true;
+        return options;
     }
   }
 

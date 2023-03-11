@@ -6,16 +6,22 @@ PTH := ../../src
 MAIN := $(PTH)/mzf2wav.c
 OBJS := argparse.o methods.o mzf.o wav.o write.o
 
+
 all: $(EXEC)
+
+$(EXEC): $(MAIN) $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $^
 
 %.o: $(PTH)/%.c $(PTH)/%.h
 	$(CC) $(CFLAGS) -c $<
 
-$(EXEC): $(MAIN) $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $^
+../../docs/cli.rst: ../../docs/cli_template.rst $(EXEC)
+	cp $< $@ && ./$(EXEC) -h >> $@
 
 clean:
 	rm -f $(OBJS) core
 
 distclean: clean
 	rm -f $(EXEC)
+
+doc: ../../docs/cli.rst

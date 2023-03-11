@@ -1,5 +1,3 @@
-.. mzf2wav documentation.
-
 .. include:: ../README.rst
 
 .. toctree::
@@ -7,6 +5,7 @@
    :caption: Contents:
 
    introduction
-   installation
+   install
+   cli
    usage
    credits

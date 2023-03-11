@@ -2,7 +2,7 @@
 #include "write.h"
 
 
-/*! Fast file transfer.
+/*! Write using the conventional format.
  *
  * \param [out] output Output file.
  * \param [in] image MZF image.
@@ -10,20 +10,20 @@
  *
  * \return Number of bytes written.
  */
-uint32_t fastTransfer(FILE *const output, IMGP image, PCP pulseConfig);
-
-/*! Conventional file transfer.
- *
- * \param [out] output Output file.
- * \param [in] image MZF image.
- * \param [in] pulseConfig Pulse config.
- *
- * \return Number of bytes written.
- */
-uint32_t conventionalTransfer(
+uint32_t conventionalFormat(
   FILE *const output, IMGP image, PCP pulseConfig);
 
-/*! Turbo file transfer.
+/*! Write using the fast format.
+ *
+ * \param [out] output Output file.
+ * \param [in] image MZF image.
+ * \param [in] pulseConfig Pulse config.
+ *
+ * \return Number of bytes written.
+ */
+uint32_t fastFormat(FILE *const output, IMGP image, PCP pulseConfig);
+
+/*! Write using the turbo format.
  *
  * \param [out] output Output file.
  * \param [in] image MZF image.
@@ -32,5 +32,5 @@ uint32_t conventionalTransfer(
  *
  * \return Number of bytes written.
  */
-uint32_t turboTransfer(
+uint32_t turboFormat(
   FILE *output, IMGP image, PCP pulseConfig, PCP turboConfig);

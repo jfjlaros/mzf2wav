@@ -28,19 +28,7 @@ void writeBody_(
 }
 
 
-uint32_t fastTransfer(FILE *const output, IMGP image, PCP pulseConfig) {
-  uint32_t size = 0;
-
-  writeLeader_(output, &size, pulseConfig, 4000, 40);
-  writeHeader_(output, &size, image, pulseConfig);
-
-  writeLeader_(output, &size, pulseConfig, 5000, 20);
-  writeBody_(output, &size, image, pulseConfig);
-
-  return size;
-}
-
-uint32_t conventionalTransfer(
+uint32_t conventionalFormat(
     FILE *const output, IMGP image, PCP pulseConfig) {
   uint32_t size = 0;
 
@@ -57,13 +45,25 @@ uint32_t conventionalTransfer(
   return size;
 }
 
-uint32_t turboTransfer(
+uint32_t fastFormat(FILE *const output, IMGP image, PCP pulseConfig) {
+  uint32_t size = 0;
+
+  writeLeader_(output, &size, pulseConfig, 4000, 40);
+  writeHeader_(output, &size, image, pulseConfig);
+
+  writeLeader_(output, &size, pulseConfig, 5000, 20);
+  writeBody_(output, &size, image, pulseConfig);
+
+  return size;
+}
+
+uint32_t turboFormat(
     FILE *const output, IMGP image, PCP pulseConfig, PCP turboConfig) {
   uint8_t turboLoader[turboLoaderSize];
   prepareLoader(turboLoader, image);
 
-  uint32_t size = fastTransfer(output, turboLoader, pulseConfig);
-  size += fastTransfer(output, image, turboConfig);
+  uint32_t size = fastFormat(output, turboLoader, pulseConfig);
+  size += fastFormat(output, image, turboConfig);
 
   return size;
 }

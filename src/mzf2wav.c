@@ -60,13 +60,13 @@ bool mzf2wav(Options const *const options) {
   uint32_t size_ = 0;
   switch (options->method) {
     case conventional:
-      size_ = conventionalTransfer(output, image, &pulseConfig);
+      size_ = conventionalFormat(output, image, &pulseConfig);
       break;
     case fast:
-      size_ = fastTransfer(output, image, &pulseConfig);
+      size_ = fastFormat(output, image, &pulseConfig);
       break;
     case turbo:
-      size_ = turboTransfer(output, image, &pulseConfig, &turboConfig);
+      size_ = turboFormat(output, image, &pulseConfig, &turboConfig);
       break;
   }
   updateHeader(output, size_, options->bitrate);
@@ -83,8 +83,10 @@ int main(int const argc, char *const *const argv) {
     printf(version);
     return 0;
   }
-  if (options.error || !mzf2wav(&options)) {
+  if (options.help || options.error) {
     printf(usage, argv[0]);
+  }
+  if (options.error || !mzf2wav(&options)) {
     return 1;
   }
 }

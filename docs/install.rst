@@ -25,17 +25,17 @@ To compile for Linux:
 
 ::
 
-    cd mzf2wav/src/linux
-    sh build.sh
+    cd build/linux
+    make
 
 For Windows, use:
 
 ::
 
-    cd mzf2wav\src\w32
-    build.bat
+    cd build/windows
+    make
 
-The binary will be placed in the ``release`` subdirectory.
+The binary will be placed in the current directory.
 
 
 .. _binaries: https://github.com/jfjlaros/mzf2wav/releases/latest

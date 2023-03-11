@@ -6,13 +6,14 @@ PTH := ../../src
 MAIN := $(PTH)/mzf2wav.c
 OBJS := argparse.o methods.o mzf.o wav.o write.o
 
-all: $(EXEC)
 
-%.o: $(PTH)/%.c $(PTH)/%.h
-	$(CC) $(CFLAGS) -c $<
+all: $(EXEC)
 
 $(EXEC): $(MAIN) $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $(MAIN) $(OBJS)
+
+%.o: $(PTH)/%.c $(PTH)/%.h
+	$(CC) $(CFLAGS) -c $<
 
 clean:
 	rm -f $(OBJS)

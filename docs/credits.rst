@@ -11,8 +11,8 @@ The author would like to acknowledge Karl-Heinz Mau for:
 And Ricky El-Qasem for:
 
 - MZF2WAVGUI_, a graphical user interface for this project.
-- Making a nice tutorial_ on how to use this software to directly connect to an
-  MZ.
+- Making a nice tutorial_ on how to use this software to directly connect to
+  an MZ.
 
 
 .. _Hosting: https://web.archive.org/web/20170831235756/https://www.sharpmz.org/mzf2wav.htm

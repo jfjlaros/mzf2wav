@@ -2,10 +2,9 @@ Introduction
 ============
 
 This project is closely related to MZPut_, which is used to transfer an MZF
-image from a PC directly to an MZ. MZPut was originally built upon this
-utility, but later versions of MZF2WAV were inspired by MZPut.
+image from a PC directly to an MZ.
 
-Also see the related pages:
+Also see these related pages:
 
 - PC tape interface_.
 - File transfer / Data transfer problem_.
