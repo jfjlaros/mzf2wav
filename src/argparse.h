@@ -17,9 +17,6 @@ typedef struct {
   bool version;        //!< Version.
 } Options;
 
-extern char const usage[];    // Usage string.
-extern char const version[];  // Version string.
-
 
 /*! Parse command line arguments.
  *

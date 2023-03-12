@@ -3,6 +3,30 @@
 
 #include "argparse.h"
 
+char const usage_[] =
+  "usage: %s [-c] [-t] [-p] [-b BITRATE] [-n SPEED] [-s SPEED] "
+  "[-N FMT] [-S FMT] MZF WAV\n\n"
+  "positional arguments:\n"
+  "  MZF          input file in MZF format\n"
+  "  WAV          input file in WAV format\n\n"
+  "options:\n"
+  "  -h           display help information and exit\n"
+  "  -v           display version information and exit\n"
+  "  -c           conventional mode\n"
+  "  -t           turbo mode\n"
+  "  -p           invert polarity\n"
+  "  -b BITRATE   bit rate (dafault: 44100)\n"
+  "  -n SPEED     normal mode speed 0 or 1 (default: 0)\n"
+  "  -s SPEED     turbo mode speed 0, 1 or 2 (default: 0)\n"
+  "  -N FMT       custom waveform for normal mode\n"
+  "  -S FMT       custom waveform for turbo mode\n\n"
+  "FMT: long_up,long_down,short_up,short_down\n";
+
+char const version_[] =
+  "MZF2WAV version 2.0.0\n"
+  "Copyright (c) 2003-2023 Jeroen F.J. Laros <jlaros@fixedpoint.nl>\n"
+  "Homepage: https://mzf2wav.readthedocs.io\n";
+
 
 unsigned int fileSize_(FILE *handle) {
   fseek(handle, 0, SEEK_END);
@@ -79,14 +103,16 @@ bool mzf2wav(Options const *const options) {
 
 int main(int const argc, char *const *const argv) {
   Options options = argParse(argc, argv);
-  if (options.version) {
-    printf(version);
+  if (options.help) {
+    printf(usage_, argv[0]);
     return 0;
   }
-  if (options.help || options.error) {
-    printf(usage, argv[0]);
+  if (options.version) {
+    printf(version_);
+    return 0;
   }
   if (options.error || !mzf2wav(&options)) {
+    printf(usage_, argv[0]);
     return 1;
   }
 }

@@ -8,4 +8,5 @@
    install
    cli
    usage
+   api
    credits

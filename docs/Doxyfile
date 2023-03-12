@@ -1,0 +1,10 @@
+INPUT                  = src/
+OUTPUT_DIRECTORY       = docs/
+
+GENERATE_HTML          = NO
+GENERATE_LATEX         = NO
+GENERATE_XML           = YES
+
+INLINE_SIMPLE_STRUCTS  = YES
+
+FILE_PATTERNS          = *.c *.h

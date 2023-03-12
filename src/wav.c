@@ -24,8 +24,8 @@ void writeInt_(FILE *const output, uint32_t const data) {
 
 
 void writeBit(FILE *const output, bool const bit, bool const invert) {
-  uint8_t const zero = 0x30;  // TODO: 0x00?
-  uint8_t const one = 0xd0;   // TODO: 0xff?
+  uint8_t const zero = 0x00;
+  uint8_t const one = 0xff;
 
   if (bit != invert) {
     fprintf(output, "%c", one);

@@ -15,7 +15,7 @@ $(EXEC): $(MAIN) $(OBJS)
 %.o: $(PTH)/%.c $(PTH)/%.h
 	$(CC) $(CFLAGS) -c $<
 
-../../docs/cli.rst: ../../docs/cli_template.rst $(EXEC)
+../../docs/cli.rst: ../../docs/cli_template.rst_ $(EXEC)
 	cp $< $@ && ./$(EXEC) -h >> $@
 
 clean:
