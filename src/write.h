@@ -1,8 +1,8 @@
 #include "wav.h"
 
 typedef struct {
-  uint16_t up;    //!< Pulse high count.
-  uint16_t down;  //!< Pulse low count.
+  uint16_t high;  //!< Pulse high count.
+  uint16_t low;   //!< Pulse low count.
 } Pulse;
 
 typedef struct {

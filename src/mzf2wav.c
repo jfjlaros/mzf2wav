@@ -20,7 +20,7 @@ char const usage_[] =
   "  -s SPEED     turbo mode speed 0, 1 or 2 (default: 0)\n"
   "  -N FMT       custom waveform for normal mode\n"
   "  -S FMT       custom waveform for turbo mode\n\n"
-  "FMT: long_up,long_down,short_up,short_down\n";
+  "FMT: long_high,long_low,short_high,short_low\n";
 
 char const version_[] =
   "MZF2WAV version 2.0.0\n"

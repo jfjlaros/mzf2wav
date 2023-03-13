@@ -2,23 +2,23 @@
 
 
 void writeLongPulse_(FILE *const output, uint32_t *size, PCP pulseConfig) {
-  for (uint16_t i = 0; i < pulseConfig->longPulse.up; ++i) {
+  for (uint16_t i = 0; i < pulseConfig->longPulse.high; ++i) {
     writeBit(output, false, pulseConfig->invert);
   }
-  for (uint16_t i = 0; i < pulseConfig->longPulse.down; ++i) {
+  for (uint16_t i = 0; i < pulseConfig->longPulse.low; ++i) {
     writeBit(output, true, pulseConfig->invert);
   }
-  *size += pulseConfig->longPulse.up + pulseConfig->longPulse.down;
+  *size += pulseConfig->longPulse.high + pulseConfig->longPulse.low;
 }
 
 void writeShortPulse_(FILE *const output, uint32_t *size, PCP pulseConfig) {
-  for (uint16_t i = 0; i < pulseConfig->shortPulse.up; ++i) {
+  for (uint16_t i = 0; i < pulseConfig->shortPulse.high; ++i) {
     writeBit(output, false, pulseConfig->invert);
   }
-  for (uint16_t i = 0; i < pulseConfig->shortPulse.down; ++i) {
+  for (uint16_t i = 0; i < pulseConfig->shortPulse.low; ++i) {
     writeBit(output, true, pulseConfig->invert);
   }
-  *size += pulseConfig->shortPulse.up + pulseConfig->shortPulse.down;
+  *size += pulseConfig->shortPulse.high + pulseConfig->shortPulse.low;
 }
 
 

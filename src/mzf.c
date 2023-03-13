@@ -96,13 +96,7 @@ uint16_t imageSize(IMGP image) {
 }
 
 bool checkImage(IMGP image, uint16_t const size) {
-  if (!image[0] || image[0] > 5) {
-    return false;
-  }
-  if (size != imageSize(image) + 128) {
-    return false;
-  }
-  return true;
+  return image[0] && size == imageSize(image) + 128;
 }
 
 void prepareLoader(uint8_t *const loader, IMGP image) {
