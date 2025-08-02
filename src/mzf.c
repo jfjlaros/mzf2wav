@@ -1,5 +1,6 @@
 #include <string.h>
 
+#include "methods.h"
 #include "mzf.h"
 
 uint8_t const turboLoader_[] = {
@@ -85,9 +86,12 @@ size_t const turboLoaderSize = sizeof(turboLoader_);
 
 
 void sanitiseImage(uint8_t *const image, uint32_t *const size) {
-  if (!memcmp(image, "MZF1", 4)) {
-    *size -= 4;
-    memmove(image, image + 4, *size);
+  char const *tag = "MZF1";
+  char const tagLength = strlen(tag);
+
+  if (!memcmp(image, tag, tagLength)) {
+    *size -= tagLength;
+    memmove(image, image + tagLength, *size);
   }
 }
 
@@ -96,7 +100,7 @@ uint16_t imageSize(IMGP image) {
 }
 
 bool checkImage(IMGP image, uint16_t const size) {
-  return image[0] && size == imageSize(image) + 128;
+  return image[0] && size == imageSize(image) + headerSize;
 }
 
 void prepareLoader(uint8_t *const loader, IMGP image) {

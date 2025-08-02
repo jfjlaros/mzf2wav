@@ -1,3 +1,5 @@
+#pragma once
+
 #include "methods.h"
 
 typedef enum {conventional, fast, turbo} Method;

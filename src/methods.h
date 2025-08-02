@@ -1,5 +1,9 @@
+#pragma once
+
 #include "mzf.h"
 #include "write.h"
+
+extern uint8_t const headerSize;  //!< Size of the MZF header.
 
 
 /*! Write using the conventional format.

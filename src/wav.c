@@ -42,17 +42,17 @@ void writeHeader(FILE *const output) {
 
 void updateHeader(
     FILE *const output, uint32_t const size, uint32_t const bitrate) {
-  // File size.
-  fseek(output, 4, SEEK_SET);
-  writeInt_(output, size + 36);
+  uint32_t const fileSizeOffset = 4;
+  fseek(output, fileSizeOffset, SEEK_SET);
+  writeInt_(output, size + sizeof(header_) - 8);
 
-  // Sample rate and bytes per second.
-  fseek(output, 24, SEEK_SET);
+  uint32_t const sampleRateOffset = 24;
+  fseek(output, sampleRateOffset, SEEK_SET);
   writeInt_(output, bitrate);
   writeInt_(output, bitrate);
 
-  // Data size.
-  fseek(output, 40, SEEK_SET);
+  uint32_t const dataSizeOffset = 24;
+  fseek(output, dataSizeOffset, SEEK_SET);
   writeInt_(output, size);
 
   fseek(output, 0, SEEK_END);

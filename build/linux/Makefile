@@ -1,5 +1,5 @@
 CC := gcc
-CFLAGS := -Wall -Wextra -pedantic -O2 -static
+CFLAGS := -std=c99 -Wall -Wextra -pedantic -O2 -static
 
 EXEC := mzf2wav
 PTH := ../../src

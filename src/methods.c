@@ -1,5 +1,10 @@
 #include "methods.h"
 
+uint8_t const headerSize = 128;
+
+uint16_t const headerTapeMarkLength_ = 40;
+uint16_t const bodyTapeMarkLength_ = 20;
+
 
 void writeLeader_(
     FILE *const output, uint32_t *const size, PCP pulseConfig,
@@ -11,7 +16,7 @@ void writeLeader_(
 void writeHeader_(
     FILE *const output, uint32_t *const size, IMGP image, PCP pulseConfig) {
   uint16_t checkSum = 0;
-  for (uint8_t i = 0; i < 128; ++i) {
+  for (uint8_t i = 0; i < headerSize; ++i) {
     checkSum += writeByte(output, size, image[i], pulseConfig);
   }
   writeChecksum(output, size, checkSum, pulseConfig);
@@ -20,8 +25,8 @@ void writeHeader_(
 void writeBody_(
     FILE *const output, uint32_t *const size, IMGP image, PCP pulseConfig) {
   uint16_t checkSum = 0;
-  uint16_t const end = imageSize(image) + 128;
-  for (uint16_t i = 128; i < end; ++i) {
+  uint16_t const end = imageSize(image) + headerSize;
+  for (uint16_t i = headerSize; i < end; ++i) {
     checkSum += writeByte(output, size, image[i], pulseConfig);
   }
   writeChecksum(output, size, checkSum, pulseConfig);
@@ -30,16 +35,20 @@ void writeBody_(
 
 uint32_t conventionalFormat(
     FILE *const output, IMGP image, PCP pulseConfig) {
+  uint16_t const gapLength = 256;
   uint32_t size = 0;
 
-  writeLeader_(output, &size, pulseConfig, 22000, 40);
+  uint16_t headerGapLength = 22000;
+  writeLeader_(
+    output, &size, pulseConfig, headerGapLength, headerTapeMarkLength_);
   writeHeader_(output, &size, image, pulseConfig);
-  writeGap(output, &size, 256, pulseConfig);
+  writeGap(output, &size, gapLength, pulseConfig);
   writeHeader_(output, &size, image, pulseConfig);
 
-  writeLeader_(output, &size, pulseConfig, 11000, 20);
+  uint16_t bodyGapLength = 11000;
+  writeLeader_(output, &size, pulseConfig, bodyGapLength, bodyTapeMarkLength_);
   writeBody_(output, &size, image, pulseConfig);
-  writeGap(output, &size, 256, pulseConfig);
+  writeGap(output, &size, gapLength, pulseConfig);
   writeBody_(output, &size, image, pulseConfig);
 
   return size;
@@ -48,10 +57,13 @@ uint32_t conventionalFormat(
 uint32_t fastFormat(FILE *const output, IMGP image, PCP pulseConfig) {
   uint32_t size = 0;
 
-  writeLeader_(output, &size, pulseConfig, 4000, 40);
+  uint16_t headerGapLength = 4000;
+  writeLeader_(
+    output, &size, pulseConfig, headerGapLength, headerTapeMarkLength_);
   writeHeader_(output, &size, image, pulseConfig);
 
-  writeLeader_(output, &size, pulseConfig, 5000, 20);
+  uint16_t bodyGapLength = 5000;
+  writeLeader_(output, &size, pulseConfig, bodyGapLength, bodyTapeMarkLength_);
   writeBody_(output, &size, image, pulseConfig);
 
   return size;
