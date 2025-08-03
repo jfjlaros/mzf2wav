@@ -24,22 +24,22 @@ char const usage_[] =
 
 char const version_[] =
   "MZF2WAV version 2.0.0\n"
-  "Copyright (c) 2003-2023 Jeroen F.J. Laros <jlaros@fixedpoint.nl>\n"
+  "Copyright (c) 2003-2025 Jeroen F.J. Laros <jlaros@fixedpoint.nl>\n"
   "Homepage: https://mzf2wav.readthedocs.io\n";
 
 
-unsigned int fileSize_(FILE *handle) {
+static unsigned int fileSize_(FILE *handle) {
   fseek(handle, 0, SEEK_END);
   unsigned int size = ftell(handle);
   rewind(handle);
   return size;
 }
 
-uint16_t scale_(uint16_t const length, uint32_t const bitrate) {
+static uint16_t scale_(uint16_t const length, uint32_t const bitrate) {
   return length * bitrate / 1000000;
 }
 
-PulseConfig makePulseConfig_(
+static PulseConfig makePulseConfig_(
     uint16_t const *const cfg, uint32_t const bitrate, bool const invert) {
   PulseConfig pulseConfig = {
     {scale_(cfg[0], bitrate), scale_(cfg[1], bitrate)},

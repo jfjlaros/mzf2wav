@@ -16,7 +16,7 @@ Options const default_ = {
   NULL, NULL, fast, false, 44100, {0}, {0}, false, false, false};
 
 
-size_t parseInt_(char const *const text, size_t const range) {
+static size_t parseInt_(char const *const text, size_t const range) {
   size_t idx = strtoul(text, NULL, 10);
   if (idx >= range) {
     return 0;
@@ -24,7 +24,7 @@ size_t parseInt_(char const *const text, size_t const range) {
   return idx;
 }
 
-void customPulses_(uint16_t *const pulses, char *const text) {
+static void customPulses_(uint16_t *const pulses, char *const text) {
   char *p = text;
   for (size_t i = 0; i < 4 && *p; ++i, ++p) {
     pulses[i] = strtoul(p, &p, 10);

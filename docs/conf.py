@@ -1,6 +1,6 @@
 project = 'mzf2wav'
 author = 'Jeroen F.J. Laros'
-copyright = '2003-2023, {}'.format(author)
+copyright = '2003-2025, {}'.format(author)
 
 extensions = ['breathe']
 breathe_projects = {'doxygen': 'xml'}

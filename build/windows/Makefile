@@ -1,5 +1,5 @@
 CC := x86_64-w64-mingw32-gcc
-CFLAGS := -Wall -Wextra -pedantic -O2 -static
+CFLAGS := -std=c99 -Wall -Wextra -pedantic -O2 -static
 
 EXEC := mzf2wav.exe
 PTH := ../../src

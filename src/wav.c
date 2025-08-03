@@ -16,7 +16,7 @@ uint8_t const header_[] = {
   0x00, 0x00, 0x00, 0x00};  // Size of data chunk.
 
 
-void writeInt_(FILE *const output, uint32_t const data) {
+static void writeInt_(FILE *const output, uint32_t const data) {
   for (size_t i = 0; i < sizeof(data); ++i) {
     fprintf(output, "%c", data >> 8 * i);
   }

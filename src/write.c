@@ -1,7 +1,7 @@
 #include "write.h"
 
 
-void writeLongPulse_(FILE *const output, uint32_t *size, PCP pulseConfig) {
+static void writeLongPulse_(FILE *const output, uint32_t *size, PCP pulseConfig) {
   for (uint16_t i = 0; i < pulseConfig->longPulse.high; ++i) {
     writeBit(output, false, pulseConfig->invert);
   }
@@ -11,7 +11,7 @@ void writeLongPulse_(FILE *const output, uint32_t *size, PCP pulseConfig) {
   *size += pulseConfig->longPulse.high + pulseConfig->longPulse.low;
 }
 
-void writeShortPulse_(FILE *const output, uint32_t *size, PCP pulseConfig) {
+static void writeShortPulse_(FILE *const output, uint32_t *size, PCP pulseConfig) {
   for (uint16_t i = 0; i < pulseConfig->shortPulse.high; ++i) {
     writeBit(output, false, pulseConfig->invert);
   }

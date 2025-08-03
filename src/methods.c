@@ -6,14 +6,14 @@ uint16_t const headerTapeMarkLength_ = 40;
 uint16_t const bodyTapeMarkLength_ = 20;
 
 
-void writeLeader_(
+static void writeLeader_(
     FILE *const output, uint32_t *const size, PCP pulseConfig,
     uint16_t const gapLength, uint16_t const tapeMarkLength) {
   writeGap(output, size, gapLength, pulseConfig);
   writeTapeMark(output, size, tapeMarkLength, pulseConfig);
 }
 
-void writeHeader_(
+static void writeHeader_(
     FILE *const output, uint32_t *const size, IMGP image, PCP pulseConfig) {
   uint16_t checkSum = 0;
   for (uint8_t i = 0; i < headerSize; ++i) {
@@ -22,7 +22,7 @@ void writeHeader_(
   writeChecksum(output, size, checkSum, pulseConfig);
 }
 
-void writeBody_(
+static void writeBody_(
     FILE *const output, uint32_t *const size, IMGP image, PCP pulseConfig) {
   uint16_t checkSum = 0;
   uint16_t const end = imageSize(image) + headerSize;
