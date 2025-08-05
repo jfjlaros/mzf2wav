@@ -1,9 +1,9 @@
 #include "methods.h"
 
-uint8_t const headerSize = 128;
-
 uint16_t const headerTapeMarkLength_ = 40;
 uint16_t const bodyTapeMarkLength_ = 20;
+
+uint8_t const headerSize = 128;
 
 
 static void writeLeader_(
