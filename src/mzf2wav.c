@@ -1,6 +1,3 @@
-#include <stdlib.h>
-#include <string.h>
-
 #include "argparse.h"
 
 char const usage_[] =

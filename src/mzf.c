@@ -1,7 +1,8 @@
+#include "mzf.h"
+
 #include <string.h>
 
 #include "methods.h"
-#include "mzf.h"
 
 uint8_t const turboLoader_[] = {
   0x01,                                                  // Program type.

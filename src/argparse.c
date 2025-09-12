@@ -1,8 +1,8 @@
+#include "argparse.h"
+
 #include <stdlib.h>
 #include <string.h>
 #include <getopt.h>
-
-#include "argparse.h"
 
 uint16_t const normalDefaults_[][4] = {
   {464, 494, 240, 264},   // Normal mode.

@@ -15,7 +15,7 @@ typedef struct {
   uint16_t turbo[4];   //!< Turbo mode pulses.
 
   bool error;          //!< Error.
-  bool help;           //!< Version.
+  bool help;           //!< Help.
   bool version;        //!< Version.
 } Options;
 
