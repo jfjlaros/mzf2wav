@@ -51,7 +51,7 @@ void updateHeader(
   writeInt_(output, bitrate);
   writeInt_(output, bitrate);
 
-  uint32_t const dataSizeOffset = 24;
+  uint32_t const dataSizeOffset = 40;
   fseek(output, dataSizeOffset, SEEK_SET);
   writeInt_(output, size);
 
