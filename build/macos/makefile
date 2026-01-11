@@ -19,7 +19,7 @@ $(EXEC): $(MAIN) $(OBJS)
 	cp $< $@ && ./$(EXEC) -h >> $@
 
 clean:
-	rm -f $(OBJS) $(EXEC) core
+	rm -f $(OBJS) core
 
 distclean: clean
 	rm -f $(EXEC)
