@@ -3,6 +3,8 @@ Contributors
 
 - Jeroen F.J. Laros <jlaros@fixedpoint.nl> (Original author, maintainer).
 - Steve Monks <mail@stevemonks.com> (MacOS port).
+- Stefan Haubenthal <stefan.haubenthal@gmail.com> (Exit codes for
+  portability).
 
 The author would like to acknowledge Karl-Heinz Mau for:
 
