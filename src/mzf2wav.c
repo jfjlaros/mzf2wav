@@ -1,5 +1,7 @@
 #include "argparse.h"
 
+#include <stdlib.h>
+
 char const usage_[] =
   "usage: %s [-c] [-t] [-p] [-b BITRATE] [-n SPEED] [-s SPEED] "
   "[-N FMT] [-S FMT] MZF WAV\n\n"
@@ -102,14 +104,14 @@ int main(int const argc, char *const *const argv) {
   Options options = argParse(argc, argv);
   if (options.help) {
     printf(usage_, argv[0]);
-    return 0;
+    return EXIT_SUCCESS;
   }
   if (options.version) {
     printf(version_);
-    return 0;
+    return EXIT_SUCCESS;
   }
   if (options.error || !mzf2wav(&options)) {
     printf(usage_, argv[0]);
-    return 1;
+    return EXIT_FAILURE;
   }
 }
